@@ -9,7 +9,19 @@
 
 <p role="status">Current player: @game.CurrentPlayer.Name</p>
 
-<button class="btn btn-primary" @onclick="AddScore">Click me</button>
+<div class="container">
+    <div class="row">
+        @for (int i = 0; i <= 12; i++)
+        {
+            var score = i;
+            <div class="col-3">
+                <button class="btn btn-primary btn-fixed-size my-2" @onclick="() => AddScore(score)">
+                    <span>@i</span>
+                </button>
+            </div>
+        }
+    </div>
+</div>
 
 <h2>Players:</h2>
 <ul>
@@ -19,7 +31,6 @@
         <li>@(i + 1). @player.Name - Score: @player.Score</li>
     }
 </ul>
-
 
 @if(game.Losers.Any())
 {
@@ -43,8 +54,8 @@
             new Player { Name = "test004" }
         });
 
-    private void AddScore()
+    private void AddScore(int score)
     {
-        game.SetThrowScoreForCurrentPlayer(new Random().Next(0,12));
+        game.SetThrowScoreForCurrentPlayer(score);
     }
 }
