@@ -1,0 +1,50 @@
+﻿@page "/"
+@using Domain;
+
+<PageTitle>Game</PageTitle>
+
+<h1>Game</h1>
+
+<p role="status">Winner: <b>@game.Winner?.Name</b></p>
+
+<p role="status">Current player: @game.CurrentPlayer.Name</p>
+
+<button class="btn btn-primary" @onclick="AddScore">Click me</button>
+
+<h2>Players:</h2>
+<ul>
+    @for (int i = 0; i < game.Players.Count; i++)
+    {
+        var player = game.Players[i];
+        <li>@(i + 1). @player.Name - Score: @player.Score</li>
+    }
+</ul>
+
+
+@if(game.Losers.Any())
+{
+    <h2>Losers:</h2>
+    <ul>
+        @for (int i = 0; i < game.Losers.Count; i++)
+        {
+            var loser = game.Losers[i];
+            <li>@(i + 1). @loser.Name</li>
+        }
+    </ul>
+}
+
+@code {
+    private Game game = Game.CreateNew(
+        new List<Player> 
+        { 
+            new Player { Name = "test001" }, 
+            new Player { Name = "test002" },
+            new Player { Name = "test003" },
+            new Player { Name = "test004" }
+        });
+
+    private void AddScore()
+    {
+        game.SetThrowScoreForCurrentPlayer(new Random().Next(0,12));
+    }
+}
