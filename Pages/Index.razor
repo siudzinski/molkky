@@ -3,34 +3,60 @@
 
 <PageTitle>Game</PageTitle>
 
-<h1>Game</h1>
-
-<p role="status">Winner: <b>@game.Winner?.Name</b></p>
-
-<p role="status">Current player: @game.CurrentPlayer.Name</p>
-
 <div class="container">
+    <h1>Game</h1>
+
+    <p role="status">Winner: <b>@game.Winner?.Name</b></p>
+
     <div class="row">
-        @for (int i = 0; i <= 12; i++)
+        <div class="col-md-12 col-sm-12 col-12 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Current player: @game.CurrentPlayer.Name</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-12 mb-3">
+            <a href="javascript:void(0);" @onclick="() => AddScore(0)" style="text-decoration: none;">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        @for (int i = 1; i <= 12; i++)
         {
             var score = i;
-            <div class="col-3">
-                <button class="btn btn-primary btn-fixed-size my-2" @onclick="() => AddScore(score)">
-                    <span>@i</span>
-                </button>
+            <div class="col-md-4 col-sm-4 col-4 mb-3">
+                <a href="javascript:void(0);" @onclick="() => AddScore(score)" style="text-decoration: none;">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">@i</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    <h2>Players:</h2>
+    <div class="row">
+        @foreach (var player in game.Players)
+        {
+            <div class="col-md-3 col-sm-6 col-6 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">@player.Name : @player.Score</h5>
+                    </div>
+                </div>
             </div>
         }
     </div>
 </div>
-
-<h2>Players:</h2>
-<ul>
-    @for (int i = 0; i < game.Players.Count; i++)
-    {
-        var player = game.Players[i];
-        <li>@(i + 1). @player.Name - Score: @player.Score</li>
-    }
-</ul>
 
 @if(game.Losers.Any())
 {
