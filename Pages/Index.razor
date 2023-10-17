@@ -1,34 +1,26 @@
 ﻿@page "/"
 @using Domain;
+@using Infrastructure;
 
 <PageTitle>Game</PageTitle>
 
 <div class="container">
     <h1>Game</h1>
 
-    <p role="status">Winner: <b>@game.Winner?.Name</b></p>
+    <p role="status">Winner: <b>@game?.Winner?.Name</b></p>
 
     <div class="row">
         <div class="col-md-12 col-sm-12 col-12 mb-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Current player: @game.CurrentPlayer.Name</h5>
+                    <h5 class="card-title">Current player: @game?.CurrentPlayer?.Name</h5>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-12 col-sm-12 col-12 mb-3">
-            <a href="javascript:void(0);" @onclick="() => AddScore(0)" style="text-decoration: none;">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">0</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
-        @for (int i = 1; i <= 12; i++)
+        @for (int i = 0; i < 12; i++)
         {
             var score = i;
             <div class="col-md-4 col-sm-4 col-4 mb-3">
@@ -41,47 +33,89 @@
                 </a>
             </div>
         }
-    </div>
-
-    <h2>Players:</h2>
-    <div class="row">
-        @foreach (var player in game.Players)
-        {
-            <div class="col-md-3 col-sm-6 col-6 mb-3">
+        <div class="col-md-12 col-sm-12 col-12 mb-3">
+            <a href="javascript:void(0);" @onclick="() => AddScore(12)" style="text-decoration: none;">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">@player.Name : @player.Score</h5>
+                        <h5 class="card-title">12</h5>
                     </div>
                 </div>
+            </a>
+        </div>
+    </div>
+
+    @if(game is not null)
+    {
+        <h2>Players:</h2>
+        <div class="row">
+            @foreach (var player in game.Players)
+            {
+                <div class="col-md-3 col-sm-6 col-6 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title @(player.NumberOfFailedThrows > 0 ? "text-danger" : "")">
+                                @player.Name : @player.Score
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if(game.Losers.Any())
+        {
+            <h3>Losers:</h3>
+            <div class="row">
+                @foreach (var loser in game.Losers)
+                {
+                    <div class="col-md-3 col-sm-6 col-6 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">@loser.Name</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         }
-    </div>
+    }
 </div>
 
-@if(game.Losers.Any())
-{
-    <h2>Losers:</h2>
-    <ul>
-        @for (int i = 0; i < game.Losers.Count; i++)
-        {
-            var loser = game.Losers[i];
-            <li>@(i + 1). @loser.Name</li>
-        }
-    </ul>
-}
+
 
 @code {
-    private Game game = Game.CreateNew(
-        new List<Player> 
-        { 
-            new Player { Name = "test001" }, 
-            new Player { Name = "test002" },
-            new Player { Name = "test003" },
-            new Player { Name = "test004" }
-        });
+    private Game game;
+
+    [Inject]
+    private GameSessionStorage? GameStorage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        game = await GameStorage.LoadGameState();
+        if (game == null)
+        {
+            game = Game.CreateNew(
+                new List<Player> 
+                { 
+                    Player.CreateNew("test001"),
+                    Player.CreateNew("test002"),
+                    Player.CreateNew("test003"),
+                    Player.CreateNew("test004")               
+                });
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await GameStorage.SaveGameState(game);
+    }
 
     private void AddScore(int score)
     {
-        game.SetThrowScoreForCurrentPlayer(score);
+        if(game is not null)
+        {
+            game.SetThrowScoreForCurrentPlayer(score);
+        }
     }
 }

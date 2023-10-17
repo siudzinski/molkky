@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Infrastructure;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">molkky</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -13,7 +15,7 @@
             <NavLink class="nav-link mb-3" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> New game
             </NavLink>
-            <NavLink class="nav-link mb-3" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link mb-3" href="/" Match="NavLinkMatch.All" @onclick="ResetGame">
                 <span class="oi oi-loop-circular" aria-hidden="true"></span> Restart game
             </NavLink>
             <NavLink class="nav-link mb-3" href="" Match="NavLinkMatch.All">
@@ -24,6 +26,9 @@
 </div>
 
 @code {
+    [Inject]
+    private GameSessionStorage? GameStorage { get; set; }
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -31,5 +36,10 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task ResetGame()
+    {
+        await GameStorage.RemoveGameState();
     }
 }

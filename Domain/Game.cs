@@ -1,3 +1,5 @@
+using molkky.Domain.StorageModels;
+
 namespace molkky.Domain;
 
 public class Game
@@ -10,19 +12,38 @@ public class Game
     private List<Player> _players;
     private int _numberOfThrowsInRound = 0;
 
-    private Game(List<Player> players)
+    private Game(IEnumerable<Player> players)
     {
-        _players = players;
-        Players = _players;
+        _players = players.ToList();
+        Players = _players.Where(_ => _.CanPlay).ToList();
+        Losers = _players.Where(_ => !_.CanPlay).ToList();
     }
 
-    public static Game CreateNew(List<Player> players)
+    private Game(IEnumerable<Player> players, int numberOfThrowsInRound) : this(players)
+    {
+        _numberOfThrowsInRound = numberOfThrowsInRound;
+    }
+
+    public static Game CreateNew(IEnumerable<Player> players)
     {
         return new Game(players);
     }
 
+    public static Game FromGameState(GameState gameState)
+    {
+        return new Game(gameState.Players.Select(Player.FromPlayerState), gameState.NumberOfThrowsInRound);
+    }
+
+    public GameState ToGameState()
+    {
+        return new GameState(_players.Select(p => p.ToPlayerState()), _numberOfThrowsInRound);
+    }
+
+
     public void SetThrowScoreForCurrentPlayer(int score)
     {
+        if(Winner is not null) return;
+        
         CurrentPlayer.AddPoints(score);
         EvaluatePlayers();
     }
