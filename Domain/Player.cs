@@ -10,6 +10,7 @@ public class Player
     public string Name { get; private set; }
     public int Score => _score;
     public int NumberOfFailedThrows => _numberOfFailedThrows;
+    public bool InDanger => _numberOfFailedThrows > 0;
     public bool CanPlay => _numberOfFailedThrows < 2;
     public bool Won => _score == 50;
 

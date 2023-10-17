@@ -40,6 +40,8 @@
 
     private async Task ResetGame()
     {
+        if(GameStorage is null) return;
+        
         await GameStorage.RemoveGameState();
     }
 }
