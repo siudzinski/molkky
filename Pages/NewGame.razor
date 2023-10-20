@@ -1,5 +1,4 @@
 @page "/"
-@page "/new-game"
 @using Domain;
 @using Infrastructure;
 @inject NavigationManager NavigationManager
@@ -69,6 +68,6 @@
         playerNames.Clear();
         playerName = string.Empty;
 
-        NavigationManager.NavigateTo("/gameplay");
+        NavigationManager.NavigateTo("/molkky/gameplay");
     }
 }
