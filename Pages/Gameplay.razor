@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/gameplay"
 @using Domain;
 @using Infrastructure;
 
@@ -19,30 +19,7 @@
         </div>
     </div>
 
-    <div class="row">
-        @for (int i = 0; i < 12; i++)
-        {
-            var score = i;
-            <div class="col-md-4 col-sm-4 col-4 mb-3">
-                <a href="javascript:void(0);" @onclick="() => AddScore(score)" style="text-decoration: none;">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title">@i</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        }
-        <div class="col-md-12 col-sm-12 col-12 mb-3">
-            <a href="javascript:void(0);" @onclick="() => AddScore(12)" style="text-decoration: none;">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">12</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
+    <Keyboard OnScoreAdded="AddScore" />
 
     @if(game is not null)
     {
@@ -81,8 +58,6 @@
     }
 </div>
 
-
-
 @code {
     private Game? game;
 
@@ -91,28 +66,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(GameStorage is null) return;
-
-        game = await GameStorage.LoadGameState();
-        if (game == null)
+        if(GameStorage is not null)
         {
-            game = Game.CreateNew(
-                new List<Player> 
-                { 
-                    Player.CreateNew("test001"),
-                    Player.CreateNew("test002"),
-                    Player.CreateNew("test003"),
-                    Player.CreateNew("test004")               
-                });
+            game = await GameStorage.LoadGameState();
         }
-        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(GameStorage is null) return;
-        
-        await GameStorage.SaveGameState(game);
+        if(GameStorage is not null)
+        {
+            await GameStorage.SaveGameState(game);
+        }
     }
 
     private void AddScore(int score)
