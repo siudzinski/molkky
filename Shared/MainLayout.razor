@@ -1,42 +1,34 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="bb-page">
+<MudThemeProvider @bind-IsDarkMode="@_darkTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <Sidebar @ref="sidebar"
-             IconName="IconName.Balloon"
-             Title="Molkky"
-             DataProvider="SidebarDataProvider" />
-
-    <main>
-        <article class="content px-4">
-            <div class="py-2">
-                @Body
-            </div>
-        </article>
-    </main>
-
-</div>
+<MudLayout>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        Molkky
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Molkky</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="" Match="NavLinkMatch.All">New game</MudNavLink>
+            <MudNavLink Href="settings" Match="NavLinkMatch.All">Settings</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
 
 @code {
-    private Sidebar sidebar = default!;
-    private IEnumerable<NavItem> navItems = default!;
+    bool _drawerOpen = true;
+    bool _darkTheme = true;
 
-    private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
+    void DrawerToggle()
     {
-        if (navItems is null)
-            navItems = GetNavItems();
-
-        return await Task.FromResult(request.ApplyTo(navItems));
-    }
-
-    private IEnumerable<NavItem> GetNavItems()
-    {
-        navItems = new List<NavItem>
-        {
-            new NavItem { Id = "1", Href = "", IconName = IconName.HouseDoorFill, Text = "New Game", Match=NavLinkMatch.All},
-            new NavItem { Id = "2", Href = "settings", IconName = IconName.GearFill, Text = "Settings"},
-        };
-
-        return navItems;
+        _drawerOpen = !_drawerOpen;
     }
 }
