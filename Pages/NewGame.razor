@@ -5,38 +5,32 @@
 
 <PageTitle>New game</PageTitle>
 
-<div class="container">
-    <h1 class="text-center">New Game</h1>
-
-    <div class="row justify-content-center">
-        <div class="col-md-6 mt-3">
-            <div class="form-group">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Enter player name" @bind="playerName" />
-                    <div class="input-group-append">
-                        <Button Color="ButtonColor.Dark" @onclick="AddPlayer">Add</Button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-md-6 mt-3">
-            <h2>Players:</h2>
-            <ul class="list-group">
-                @foreach (var player in playerNames)
-                {
-                    <li class="list-group-item">@player</li>
-                }
-            </ul>
-        </div>
-    </div>
-
-    <div class="d-grid gap-2 mt-3">
-        <Button Color="ButtonColor.Dark" @onclick="StartGame" Disabled="@StartGameDisabled"> Start Game </Button>
-    </div>
-</div>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">New Game</MudText>
+        </MudItem>
+        @foreach(var name in playerNames)
+        {
+            <MudItem xs="6" sm="6" md="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="true">@name</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+        <MudItem xs="12" sm="12" md="12">
+            <MudTextField @bind-Value="playerName" Label="Enter player name" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.PersonOutline" />
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="AddPlayer">Add</MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudButton Variant="Variant.Filled" OnClick="StartGame" FullWidth="true" Color="Color.Primary" Disabled="@StartGameDisabled">Start Game</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
     private string? playerName;
