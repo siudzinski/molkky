@@ -1,27 +1,13 @@
-<div class="row">
-    @for (int i = 0; i < 12; i++)
-    {
-        var score = i;
-        <div class="col-md-4 col-sm-4 col-4 mb-3">
-            <a href="javascript:void(0);" @onclick="() => HandleOnScoreAdded(score)" style="text-decoration: none;">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">@i</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
-    }
-    <div class="col-md-12 col-sm-12 col-12 mb-3">
-        <a href="javascript:void(0);" @onclick="() => HandleOnScoreAdded(12)" style="text-decoration: none;">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">12</h5>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
+@for (int i = 0; i < 12; i++)
+{
+    var score = i;
+    <MudItem xs="4" sm="4" md="4">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="() => HandleOnScoreAdded(score)">@score</MudButton>
+    </MudItem>
+}
+<MudItem xs="12" sm="12" md="12">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="() => HandleOnScoreAdded(12)">12</MudButton>
+</MudItem>
 
 @code {
     [Parameter]

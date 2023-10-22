@@ -4,59 +4,41 @@
 
 <PageTitle>Game</PageTitle>
 
-<div class="container">
-    <h1>Game</h1>
-
-    <p role="status">Winner: <b>@game?.Winner?.Name</b></p>
-
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-12 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Current player: @game?.CurrentPlayer?.Name</h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <Keyboard OnScoreAdded="AddScore" />
-
-    @if(game is not null)
-    {
-        <h2>Players:</h2>
-        <div class="row">
-            @foreach (var player in game.Players)
-            {
-                <div class="col-md-3 col-sm-6 col-6 mb-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title @(player.InDanger ? "text-danger" : "")">
-                                @player.Name : @player.Score
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        @if(game.Losers.Any())
+<MudContainer Class="mt-8 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Current player: @game?.CurrentPlayer?.Name</MudText>
+        </MudItem>
+        <Keyboard OnScoreAdded="AddScore" />
+        @if(game is not null)
         {
-            <h3>Losers:</h3>
-            <div class="row">
+            <MudItem xs="12" sm="12" md="12">
+                <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="true">Players</MudText>
+                @foreach (var player in game.Players)
+                {
+                    var text = $"{player.Name} Score:{player.Score}";
+                    <MudList>
+                        <MudListItem Text="@text" Icon="@Icons.Material.Filled.Person" />
+                    </MudList>
+                }
+            </MudItem>
+            <MudItem xs="12" sm="12" md="12">
+                <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="true">Losers</MudText>
+            </MudItem>
+            @if(game.Losers.Any())
+            {
                 @foreach (var loser in game.Losers)
                 {
-                    <div class="col-md-3 col-sm-6 col-6 mb-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5 class="card-title">@loser.Name</h5>
-                            </div>
-                        </div>
-                    </div>
+                    <MudItem xs="4" sm="4" md="4">
+                        <MudBadge Icon="@Icons.Material.Filled.Cancel" Overlap="true" Color="Color.Error" Class="mx-6 my-4">
+                            <MudChip Label="true" Color="Color.Warning" Style="color:black;">@loser.Name</MudChip>
+                        </MudBadge>
+                    </MudItem>
                 }
-            </div>
+            }
         }
-    }
-</div>
+    </MudGrid>
+</MudContainer>
 
 @code {
     private Game? game;
