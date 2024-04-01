@@ -8,6 +8,7 @@ public class Game
     public List<Player> Losers { get; private set; } = new List<Player>();
     public Player CurrentPlayer => Players[_numberOfThrowsInRound];
     public Player? Winner => Players.FirstOrDefault(_ => _.Won) ?? (Players.Count > 1 ? null : Players.First());
+    public bool AnyWinner => Winner is not null;
     public int RoundNumber => _roundNumber;
 
     private List<Player> _players;

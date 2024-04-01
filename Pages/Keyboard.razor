@@ -1,3 +1,5 @@
+@inject IDialogService DialogService
+
 @for (int i = 0; i < 12; i++)
 {
     var score = i;
@@ -15,6 +17,15 @@
 
     private async Task HandleOnScoreAdded(int score)
     {
-        await OnScoreAdded.InvokeAsync(score);
+        var parameters = new DialogParameters<ConfirmationDialog>();
+        parameters.Add(x => x.Score, score);
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirmation", parameters, options);
+        var result = await dialog.Result;
+        if(!result.Canceled)
+        {
+            await OnScoreAdded.InvokeAsync(score);
+        }
     }
 }
