@@ -1,0 +1,22 @@
+@page "/settings"
+
+<PageTitle>Settings</PageTitle>
+
+<MudContainer Class="mt-8 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">Settings</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudSwitch @bind-Checked="@bar" Color="Color.Primary">Bar bar bar</MudSwitch>
+        </MudItem>
+        <MudItem xs="12">
+            <MudSwitch @bind-Checked="@foo" Color="Color.Primary">Foo foo</MudSwitch>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private bool bar = true;
+    private bool foo = false;
+}
