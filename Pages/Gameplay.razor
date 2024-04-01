@@ -6,34 +6,67 @@
 
 <MudContainer Class="mt-8 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
-        <MudItem xs="12" sm="12" md="12">
-            <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Current player: @game?.CurrentPlayer?.Name</MudText>
+        <MudItem xs="12">
+            <MudGrid Justify="Justify.FlexEnd" Spacing="0">
+                <MudItem>
+                    <MudIcon Icon="@Icons.Material.Filled.Alarm" />
+                </MudItem>
+                <MudItem>
+                    <MudText>Round: @game?.RoundNumber</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="p-2" Elevation="1">
+                <MudGrid Justify="Justify.Center">
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.h6" Align="Align.Center">Player: @game?.CurrentPlayer?.Name</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
         </MudItem>
         <Keyboard OnScoreAdded="AddScore" />
         @if(game is not null)
         {
-            <MudItem xs="12" sm="12" md="12">
-                <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="true">Players</MudText>
-                @foreach (var player in game.Players)
-                {
-                    var text = $"{player.Name} Score:{player.Score}";
-                    <MudList>
-                        <MudListItem Text="@text" Icon="@Icons.Material.Filled.Person" />
-                    </MudList>
-                }
-            </MudItem>
-            <MudItem xs="12" sm="12" md="12">
-                <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="true">Losers</MudText>
-            </MudItem>
+            @foreach (var player in game.Players)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="4">
+                                    <MudAvatar Size="Size.Large" Color="Color.Tertiary">@player.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                                </MudItem>
+                                <MudItem xs="8">
+                                    <MudGrid>
+                                        <MudItem xs="10">
+                                            <MudText Typo="Typo.h6">@player.Name</MudText>
+                                            <MudText>Score: @player.Score</MudText>
+                                        </MudItem>
+                                        <MudItem xs="2" Class="icon-item">
+                                            @if (player.InDanger)
+                                            {
+                                                <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
+                                            }
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
             @if(game.Losers.Any())
             {
+                <MudDivider />
                 @foreach (var loser in game.Losers)
                 {
-                    <MudItem xs="4" sm="4" md="4">
-                        <MudBadge Icon="@Icons.Material.Filled.Cancel" Overlap="true" Color="Color.Error" Class="mx-6 my-4">
-                            <MudChip Label="true" Color="Color.Warning" Style="color:black;">@loser.Name</MudChip>
-                        </MudBadge>
-                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                    <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
+                        <MudAvatar Size="Size.Large" Color="Color.Tertiary">@loser.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                        @loser.Name
+                    </MudChip>
+                </MudItem>
                 }
             }
         }

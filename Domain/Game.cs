@@ -8,9 +8,11 @@ public class Game
     public List<Player> Losers { get; private set; } = new List<Player>();
     public Player CurrentPlayer => Players[_numberOfThrowsInRound];
     public Player? Winner => Players.FirstOrDefault(_ => _.Won) ?? (Players.Count > 1 ? null : Players.First());
+    public int RoundNumber => _roundNumber;
 
     private List<Player> _players;
     private int _numberOfThrowsInRound = 0;
+    private int _roundNumber = 1;
 
     private Game(IEnumerable<Player> players)
     {
@@ -19,9 +21,10 @@ public class Game
         Losers = _players.Where(_ => !_.CanPlay).ToList();
     }
 
-    private Game(IEnumerable<Player> players, int numberOfThrowsInRound) : this(players)
+    private Game(IEnumerable<Player> players, int numberOfThrowsInRound, int roundNumber) : this(players)
     {
         _numberOfThrowsInRound = numberOfThrowsInRound;
+        _roundNumber = roundNumber;
     }
 
     public static Game CreateNew(IEnumerable<Player> players)
@@ -31,12 +34,12 @@ public class Game
 
     public static Game FromGameState(GameState gameState)
     {
-        return new Game(gameState.Players.Select(Player.FromPlayerState), gameState.NumberOfThrowsInRound);
+        return new Game(gameState.Players.Select(Player.FromPlayerState), gameState.NumberOfThrowsInRound, gameState.RoundNumber);
     }
 
     public GameState ToGameState()
     {
-        return new GameState(_players.Select(p => p.ToPlayerState()), _numberOfThrowsInRound);
+        return new GameState(_players.Select(p => p.ToPlayerState()), _numberOfThrowsInRound, _roundNumber);
     }
 
 
@@ -59,6 +62,7 @@ public class Game
         {
             _numberOfThrowsInRound = 0;
             _players = _players.OrderBy(_ => _.Score).ToList();
+            _roundNumber++;
         }
 
         Players = _players.Where(_ => _.CanPlay).ToList();
