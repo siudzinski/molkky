@@ -11,8 +11,7 @@ public class Player
     public int Score => _score;
     public int NumberOfFailedThrows => _numberOfFailedThrows;
     public bool InDanger => _numberOfFailedThrows > 0;
-    public bool CanPlay => _numberOfFailedThrows < 2;
-    public bool Won => _score == 50;
+    public bool CanPlay => _numberOfFailedThrows < 3;
 
     private Player(string name)
     {
@@ -40,7 +39,7 @@ public class Player
         return new PlayerState(Name, _score, _numberOfFailedThrows);
     }
 
-    public void AddPoints(int score)
+    public void AddPoints(int score, MaximumPointsStrategies maximumPointsStrategy)
     {
         if(!CanPlay) return;
         
@@ -50,7 +49,15 @@ public class Player
             _numberOfFailedThrows = 0;
             if(_score > 50)
             {
-                _score = 25;
+                //TODO inject strategy instead of enum
+                if(maximumPointsStrategy == MaximumPointsStrategies.MaxScoreInHalf)
+                {
+                    _score = 25;
+                }
+                if(maximumPointsStrategy == MaximumPointsStrategies.BackToZero) 
+                {
+                    _score = 0;
+                }
             }
         }
         else
