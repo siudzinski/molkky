@@ -11,18 +11,14 @@ public class SettingsSessionStorage
 
     private readonly IJSRuntime _jsRuntime;
 
+    private readonly SettingsState defaultSettingsState = new(MaximumPointsStrategies.MaxScoreInHalf, MissedThrowsStrategies.Disqualified);
+
     public SettingsSessionStorage(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }
 
-    public async Task InitSettingsState()
-    {
-        var jsonString = JsonSerializer.Serialize(new SettingsState(MaximumPointsStrategies.MaxScoreInHalf));
-        await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", StorageKey, jsonString);
-    }
-
-    public async Task<MaximumPointsStrategies> LoadSettingsState()
+    public async Task<SettingsState> LoadSettingsState()
     {
         var jsonString = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", StorageKey);
         if (jsonString != null)
@@ -33,22 +29,20 @@ public class SettingsSessionStorage
                 PropertyNameCaseInsensitive = true
             });
 
-            if(settingsState is null) return MaximumPointsStrategies.MaxScoreInHalf;
-
-            return settingsState.MaximumPointsStrategy;
+            if(settingsState is not null)
+            {
+                return settingsState;
+            }
         }
 
-        return MaximumPointsStrategies.MaxScoreInHalf;
+        await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", StorageKey, JsonSerializer.Serialize(defaultSettingsState));
+
+        return defaultSettingsState;
     }
 
-    public async Task SaveSettingsState(MaximumPointsStrategies maximumPointsStrategy)
+    public async Task SaveSettingsState(SettingsState settingsState)
     {
-        var jsonString = JsonSerializer.Serialize(new SettingsState(maximumPointsStrategy));
+        var jsonString = JsonSerializer.Serialize(settingsState);
         await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", StorageKey, jsonString);
-    }
-
-    public async Task RemoveSettingsState()
-    {
-        await _jsRuntime.InvokeAsync<string>("sessionStorage.removeItem", StorageKey);
     }
 }

@@ -17,11 +17,13 @@ public class Game
     private int _numberOfThrowsInRound = 0;
     private int _roundNumber = 1;
     private readonly MaximumPointsStrategies _maximumPointsStrategy;
+    private readonly MissedThrowsStrategies _missedThrowsStrategy;
 
-    private Game(IEnumerable<Player> players, MaximumPointsStrategies maximumPointsStrategy)
+    private Game(IEnumerable<Player> players, MaximumPointsStrategies maximumPointsStrategy, MissedThrowsStrategies missedThrowsStrategy)
     {
         _players = players.ToList();
         _maximumPointsStrategy = maximumPointsStrategy;
+        _missedThrowsStrategy = missedThrowsStrategy;
         Players = _players.Where(_ => _.CanPlay).ToList();
         Losers = _players.Where(_ => !_.CanPlay).ToList();
     }
@@ -29,37 +31,43 @@ public class Game
     private Game(
         IEnumerable<Player> players,
         MaximumPointsStrategies maximumPointsStrategy,
+        MissedThrowsStrategies missedThrowsStrategy,
         int numberOfThrowsInRound, 
-        int roundNumber) : this(players, maximumPointsStrategy)
+        int roundNumber) : this(players, maximumPointsStrategy, missedThrowsStrategy)
     {
         _numberOfThrowsInRound = numberOfThrowsInRound;
         _roundNumber = roundNumber;
     }
 
-    public static Game CreateNew(IEnumerable<Player> players, MaximumPointsStrategies maximumPointsStrategy)
+    public static Game CreateNew(
+        IEnumerable<Player> players, 
+        MaximumPointsStrategies maximumPointsStrategy, 
+        MissedThrowsStrategies missedThrowsStrategy)
     {
-        return new Game(players, maximumPointsStrategy);
+        return new Game(players, maximumPointsStrategy, missedThrowsStrategy);
     }
 
     public static Game FromGameState(GameState gameState)
     {
         return new Game(
             gameState.Players.Select(Player.FromPlayerState), 
-            gameState.MaximumPointsStrategy, 
-            gameState.NumberOfThrowsInRound, 
+            gameState.MaximumPointsStrategy,
+            gameState.MissedThrowsStrategy,
+            gameState.NumberOfThrowsInRound,
             gameState.RoundNumber);
     }
 
     public GameState ToGameState()
     {
-        return new GameState(_players.Select(p => p.ToPlayerState()), _maximumPointsStrategy, _numberOfThrowsInRound, _roundNumber);
+        return new GameState(
+            _players.Select(p => p.ToPlayerState()), _maximumPointsStrategy, _missedThrowsStrategy, _numberOfThrowsInRound, _roundNumber);
     }
 
     public void SetThrowScoreForCurrentPlayer(int score)
     {
         if(Winner is not null) return;
         
-        CurrentPlayer.AddPoints(score, _maximumPointsStrategy);
+        CurrentPlayer.AddPoints(score, _maximumPointsStrategy, _missedThrowsStrategy);
         EvaluatePlayers();
     }
 

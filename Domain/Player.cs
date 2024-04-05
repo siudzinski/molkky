@@ -39,7 +39,10 @@ public class Player
         return new PlayerState(Name, _score, _numberOfFailedThrows);
     }
 
-    public void AddPoints(int score, MaximumPointsStrategies maximumPointsStrategy)
+    public void AddPoints(
+        int score, 
+        MaximumPointsStrategies maximumPointsStrategy, 
+        MissedThrowsStrategies missedThrowsStrategy)
     {
         if(!CanPlay) return;
         
@@ -62,7 +65,20 @@ public class Player
         }
         else
         {
-            _numberOfFailedThrows++;
+            //TODO inject strategy instead of enum
+            if(missedThrowsStrategy == MissedThrowsStrategies.Disqualified)
+            {
+                _numberOfFailedThrows++;
+            }
+            if(missedThrowsStrategy == MissedThrowsStrategies.BackToZero)
+            {
+                _numberOfFailedThrows++;
+                if(_numberOfFailedThrows == 3)
+                {
+                    _numberOfFailedThrows = 0;
+                    _score = 0;
+                }
+            }
         }
     }
 }

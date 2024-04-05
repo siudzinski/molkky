@@ -41,14 +41,6 @@
     [Inject]
     private SettingsSessionStorage? SettingsStorage { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        if(SettingsStorage is not null)
-        {
-            await SettingsStorage.InitSettingsState();
-        }
-    }
-
     private void AddPlayer()
     {
         if (!string.IsNullOrWhiteSpace(playerName))
@@ -67,8 +59,8 @@
     {
         if(GameStorage is not null && SettingsStorage is not null)
         {
-            var maximumPointsStrategy = await SettingsStorage.LoadSettingsState();
-            var game = Game.CreateNew(playerNames.Select(name => Player.CreateNew(name)), maximumPointsStrategy);
+            var (maximumPointsStrategy, missedThrowsStrategy) = await SettingsStorage.LoadSettingsState();
+            var game = Game.CreateNew(playerNames.Select(name => Player.CreateNew(name)), maximumPointsStrategy, missedThrowsStrategy);
             await GameStorage.SaveGameState(game);
         }
 

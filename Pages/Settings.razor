@@ -1,3 +1,7 @@
+@using molkky.Domain
+@using molkky.Domain.StorageModels
+@using molkky.Infrastructure
+
 @page "/settings"
 
 <PageTitle>Settings</PageTitle>
@@ -7,16 +11,56 @@
         <MudItem xs="12">
             <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">Settings</MudText>
         </MudItem>
+        <MudDivider />
         <MudItem xs="12">
-            <MudSwitch @bind-Checked="@bar" Color="Color.Primary">Bar bar bar</MudSwitch>
+            <MudText>What happens when player scores more than maximum points?</MudText>
         </MudItem>
         <MudItem xs="12">
-            <MudSwitch @bind-Checked="@foo" Color="Color.Primary">Foo foo</MudSwitch>
+            <MudRadioGroup @bind-Value="@MaximumPointsStrategy">
+                <MudRadio Value="@MaximumPointsStrategies.MaxScoreInHalf.ToString()" Color="Color.Primary">Max score in half</MudRadio>
+                <MudRadio Value="@MaximumPointsStrategies.BackToZero.ToString()" Color="Color.Primary">Back to zero</MudRadio>
+            </MudRadioGroup>
         </MudItem>
+        <MudDivider />
+        <MudItem xs="12">
+            <MudText>What happens when a player throws 3 misses in a row?</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudRadioGroup @bind-Value="@MissedThrowsStrategy">
+                <MudRadio Value="@MissedThrowsStrategies.Disqualified.ToString()" Color="Color.Primary">Disqualified</MudRadio>
+                <MudRadio Value="@MissedThrowsStrategies.BackToZero.ToString()" Color="Color.Primary">Back to zero</MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+        <MudDivider />
     </MudGrid>
 </MudContainer>
 
 @code {
-    private bool bar = true;
-    private bool foo = false;
+
+    [Inject]
+    private SettingsSessionStorage? SettingsStorage { get; set; }
+
+    public string MaximumPointsStrategy { get; set; } = MaximumPointsStrategies.MaxScoreInHalf.ToString();
+    public string MissedThrowsStrategy { get; set; } = MissedThrowsStrategies.Disqualified.ToString();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(SettingsStorage is not null)
+        {
+            var settings = await SettingsStorage.LoadSettingsState();
+            MaximumPointsStrategy = settings.MaximumPointsStrategy.ToString();
+            MissedThrowsStrategy = settings.MissedThrowsStrategy.ToString();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(SettingsStorage is not null)
+        {
+            var maximumPointsStrategy = Enum.Parse<MaximumPointsStrategies>(MaximumPointsStrategy);
+            var missedThrowsStrategy = Enum.Parse<MissedThrowsStrategies>(MissedThrowsStrategy);
+
+            await SettingsStorage.SaveSettingsState(new SettingsState(maximumPointsStrategy, missedThrowsStrategy));
+        }
+    }
 }
