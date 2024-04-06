@@ -19,10 +19,11 @@
     {
         var parameters = new DialogParameters<ConfirmationDialog>();
         parameters.Add(x => x.Score, score);
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Small, NoHeader = true };
 
-        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirmation", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("", parameters, options);
         var result = await dialog.Result;
+
         if(!result.Canceled)
         {
             await OnScoreAdded.InvokeAsync(score);
