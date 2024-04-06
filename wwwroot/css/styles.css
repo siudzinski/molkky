@@ -10,9 +10,3 @@
     flex-grow: 1; /* Allows the text to take up available space, pushing the button to the right */
     text-align: left; /* Ensure text is left-aligned */
 }
-
-.icon-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
