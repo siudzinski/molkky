@@ -36,7 +36,7 @@
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="4">
-                                    <MudAvatar Size="Size.Large" Color="Color.Tertiary">@player.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                                    <MudAvatar Size="Size.Large" Color="Color.Success">@player.FirstLetter</MudAvatar>
                                 </MudItem>
                                 <MudItem xs="8">
                                     <MudGrid>
@@ -67,7 +67,7 @@
                 {
                     <MudItem xs="12" sm="6" md="4">
                     <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
-                        <MudAvatar Size="Size.Large" Color="Color.Tertiary">@loser.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                        <MudAvatar Size="Size.Large" Color="Color.Tertiary">@loser.FirstLetter</MudAvatar>
                         @loser.Name
                     </MudChip>
                 </MudItem>

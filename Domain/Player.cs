@@ -8,6 +8,7 @@ public class Player
     private int _numberOfFailedThrows = 0;
 
     public string Name { get; private set; }
+    public string FirstLetter => Name[..1].ToUpper();
     public int Score => _score;
     public int NumberOfFailedThrows => _numberOfFailedThrows;
     public bool InDanger => _numberOfFailedThrows > 0;
