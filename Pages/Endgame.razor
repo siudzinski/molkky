@@ -1,6 +1,6 @@
 @page "/endgame"
-
 @using molkky.Infrastructure
+@inject NavigationManager NavigationManager
 
 <PageTitle>Endgame</PageTitle>
 
@@ -22,7 +22,7 @@
             <MudButton Variant="Variant.Filled" FullWidth="true">Play again</MudButton>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true">New game</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">New game</MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -43,18 +43,27 @@
         if(GameStorage is null) return;
         
         var game = await GameStorage.LoadGameState();
-        var stats = game?.ToGameStats();
+        var stats = game?.ToStats();
 
         if (stats is null) return;
         
         var players = new List<ChartSeries>();
         foreach (var player in stats.Players)
         {
-            players.Add(new ChartSeries { Name = player.Name, Data = player.ScoreHistory.Select(x => (double)x).ToArray() });
+            players.Add(new ChartSeries 
+            { 
+                Name = player.Name, 
+                Data = player.ScoreHistory
+            });
         }
 
         Series = players;
         XAxisLabels = stats.Rounds;
         Winner = stats.Winner;
+    }
+
+    private void NewGame()
+    {
+        NavigationManager.NavigateTo("");
     }
 }

@@ -63,7 +63,7 @@ public class Game
             _players.Select(p => p.ToPlayerState()), _maximumPointsStrategy, _missedThrowsStrategy, _numberOfThrowsInRound, _roundNumber);
     }
 
-    public Stats ToGameStats()
+    public Stats ToStats()
     {
         if (Winner is null)
         {

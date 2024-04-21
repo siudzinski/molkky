@@ -13,8 +13,18 @@ public class Stats
     {
         Winner = winner;
         Players = players;
-        Rounds = Enumerable.Range(1, roundsNumber).Select(i => i.ToString()).ToArray();
+        Rounds = Enumerable.Range(0, roundsNumber).Select(i => i.ToString()).ToArray();
     }
 }
 
-public record PlayerStats(string Name, IEnumerable<int> ScoreHistory);
+public class PlayerStats
+{
+    public string Name { get; }
+    public double[] ScoreHistory { get; }
+
+    public PlayerStats(string name, IEnumerable<int> scoreHistory)
+    {
+        Name = name;
+        ScoreHistory = new double[] { 0 }.Concat(scoreHistory.Select(x => (double)x)).ToArray();
+    }
+}

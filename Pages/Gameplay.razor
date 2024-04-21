@@ -1,6 +1,7 @@
 ﻿@page "/gameplay"
 @using Domain;
 @using Infrastructure;
+@inject NavigationManager NavigationManager
 
 <PageTitle>Game</PageTitle>
 
@@ -75,26 +76,10 @@
             }
         }
     </MudGrid>
-    <MudOverlay Visible="@IsOverlayVisible" DarkBackground="true" Absolute="true">
-        <MudPaper Class="pa-4" Elevation="3" Square="false">
-            <MudGrid>
-                <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
-                </MudItem>
-                <MudItem xs="8">
-                    <MudText Align="Align.Center" Typo="Typo.h5">@game?.Winner?.Name won the game!</MudText>
-                </MudItem>
-                <MudItem xs="2">
-                    <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-    </MudOverlay>
 </MudContainer>
 
 @code {
     private Game? game;
-    private bool IsOverlayVisible => game?.AnyWinner ?? false;
 
     [Inject]
     private GameSessionStorage? GameStorage { get; set; }
@@ -112,6 +97,11 @@
         if(GameStorage is not null)
         {
             await GameStorage.SaveGameState(game);
+        }
+
+        if(game?.AnyWinner ?? false)
+        {
+            NavigationManager.NavigateTo("endgame");
         }
     }
 
