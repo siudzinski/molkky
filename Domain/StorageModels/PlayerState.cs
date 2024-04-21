@@ -1,6 +1,6 @@
 namespace molkky.Domain.StorageModels;
 
-public record PlayerState(string Name, int Score, int NumberOfFailedThrows);
+public record PlayerState(string Name, int Score, int NumberOfFailedThrows, int[] ScoreHistory);
 
 public static class PlayerExtensions
 {

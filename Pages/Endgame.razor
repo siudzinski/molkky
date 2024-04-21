@@ -1,5 +1,7 @@
 @page "/endgame"
 
+@using molkky.Infrastructure
+
 <PageTitle>Endgame</PageTitle>
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
@@ -8,7 +10,7 @@
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
         </MudItem>
         <MudItem xs="8">
-            <MudText Align="Align.Center" Typo="Typo.h5">Tomasz won the game!</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h5">@Winner won the game!</MudText>
         </MudItem>
         <MudItem xs="2">
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
@@ -26,19 +28,33 @@
 </MudContainer>
 
 @code {
+    [Inject]
+    private GameSessionStorage? GameStorage { get; set; }
+    
+    public string Winner = string.Empty;
     public List<ChartSeries> Series = new List<ChartSeries>();
-    public string[] XAxisLabels = {"1", "2", "3", "4", "5", "6" };
+    public string[] XAxisLabels = Array.Empty<string>();
     public ChartOptions Options = new ChartOptions() { YAxisTicks = 1 };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
+        if(GameStorage is null) return;
+        
+        var game = await GameStorage.LoadGameState();
+        var stats = game?.ToGameStats();
+
+        if (stats is null) return;
+        
         var players = new List<ChartSeries>();
-        players.Add(new ChartSeries { Name = "Tomasz", Data = new double[] { 2, 14, 26, 38, 40, 50 } });
-        players.Add(new ChartSeries { Name = "Adam", Data = new double[] { 12, 24, 36, 48, 25, 25 } });
-        players.Add(new ChartSeries { Name = "Iza", Data = new double[] { 12, 12, 12, 12 } });
+        foreach (var player in stats.Players)
+        {
+            players.Add(new ChartSeries { Name = player.Name, Data = player.ScoreHistory.Select(x => (double)x).ToArray() });
+        }
 
         Series = players;
+        XAxisLabels = stats.Rounds;
+        Winner = stats.Winner;
     }
 }

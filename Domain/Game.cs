@@ -63,6 +63,18 @@ public class Game
             _players.Select(p => p.ToPlayerState()), _maximumPointsStrategy, _missedThrowsStrategy, _numberOfThrowsInRound, _roundNumber);
     }
 
+    public Stats ToGameStats()
+    {
+        if (Winner is null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var players = _players.Select(p => new PlayerStats(p.Name, p.ScoreHistory));
+
+        return new Stats(Winner.Name, players, _roundNumber);
+    }
+
     public void SetThrowScoreForCurrentPlayer(int score)
     {
         if(Winner is not null) return;
