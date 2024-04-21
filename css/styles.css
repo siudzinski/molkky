@@ -1,0 +1,12 @@
+/* Apply flexbox layout to the MudChip */
+.full-width-chip {
+    display: flex;
+    justify-content: space-between; /* This spreads out the child elements */
+    align-items: center;
+    width: 100%;
+}
+
+.full-width-chip .mud-chip-label {
+    flex-grow: 1; /* Allows the text to take up available space, pushing the button to the right */
+    text-align: left; /* Ensure text is left-aligned */
+}
