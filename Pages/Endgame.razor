@@ -1,4 +1,5 @@
 @page "/endgame"
+@using molkky.Domain
 @using molkky.Infrastructure
 @inject NavigationManager NavigationManager
 
@@ -19,7 +20,7 @@
             <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="@Options" Width="100%" CanHideSeries/>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true">Play again</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">Play again</MudButton>
         </MudItem>
         <MudItem xs="12">
             <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">New game</MudButton>
@@ -30,6 +31,8 @@
 @code {
     [Inject]
     private GameSessionStorage? GameStorage { get; set; }
+
+    private Game? game;
     
     public string Winner = string.Empty;
     public List<ChartSeries> Series = new List<ChartSeries>();
@@ -42,7 +45,7 @@
 
         if(GameStorage is null) return;
         
-        var game = await GameStorage.LoadGameState();
+        game = await GameStorage.LoadGameState();
         var stats = game?.ToStats();
 
         if (stats is null) return;
@@ -65,5 +68,15 @@
     private void NewGame()
     {
         NavigationManager.NavigateTo("");
+    }
+
+    private async Task PlayAgain()
+    {
+        if(game is not null && GameStorage is not null)
+        {
+            game.PlayAgain();
+            await GameStorage.SaveGameState(game);
+            NavigationManager.NavigateTo("gameplay");
+        }
     }
 }

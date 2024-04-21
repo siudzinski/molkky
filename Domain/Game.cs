@@ -47,6 +47,16 @@ public class Game
         return new Game(players, maximumPointsStrategy, missedThrowsStrategy);
     }
 
+    public void PlayAgain()
+    {
+        _roundNumber = 1;
+        _numberOfThrowsInRound = 0;
+        foreach(var player in _players)
+        {
+            player.Reset();
+        }
+    }
+
     public static Game FromGameState(GameState gameState)
     {
         return new Game(

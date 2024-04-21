@@ -44,6 +44,13 @@ public class Player
         return new PlayerState(Name, _score, _numberOfFailedThrows, _scoreHistory.ToArray());
     }
 
+    public void Reset()
+    {
+        _score = 0;
+        _numberOfFailedThrows = 0;
+        _scoreHistory = new();
+    }
+
     public void AddPoints(
         int score, 
         MaximumPointsStrategies maximumPointsStrategy, 
