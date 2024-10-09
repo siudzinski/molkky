@@ -20,7 +20,9 @@
             </MudItem>
         }
         <MudItem xs="12" sm="12" md="12">
-            <MudTextField @bind-Value="playerName" Label="Enter player name" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.PersonOutline" />
+            <MudTextField @bind-Value="playerName" Label="Enter player name" Variant="Variant.Outlined" 
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.PersonOutline"
+                          @onkeyup="HandleKeyPress" />
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
             <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="AddPlayer">Add</MudButton>
@@ -68,5 +70,13 @@
         playerName = string.Empty;
 
         NavigationManager.NavigateTo("gameplay");
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddPlayer();
+        }
     }
 }
