@@ -11,6 +11,7 @@ public class Player
 
     public string Name { get; private set; }
     public string FirstLetter => Name[..1].ToUpper();
+    public string AvatarColor { get; private set; }
     public int Score => _score;
     public ReadOnlyCollection<int> ScoreHistory => _scoreHistory.AsReadOnly();
     public int NumberOfFailedThrows => _numberOfFailedThrows;
@@ -20,13 +21,16 @@ public class Player
     private Player(string name)
     {
         Name = name;
+        AvatarColor = ColorProvider.Instance.GetNextColor();
     }
 
-    private Player(string name, int score, int numberOfFailedThrows, int[] scoreHistory) : this(name)
+    private Player(string name, int score, int numberOfFailedThrows, int[] scoreHistory, string avatarColor)
     {
+        Name = name;
         _score = score;
         _numberOfFailedThrows = numberOfFailedThrows;
         _scoreHistory = scoreHistory.ToList();
+        AvatarColor = avatarColor;
     }
 
     public static Player CreateNew(string name)
@@ -36,12 +40,12 @@ public class Player
 
     public static Player FromPlayerState(PlayerState playerState)
     {
-        return new Player(playerState.Name, playerState.Score, playerState.NumberOfFailedThrows, playerState.ScoreHistory);
+        return new Player(playerState.Name, playerState.Score, playerState.NumberOfFailedThrows, playerState.ScoreHistory, playerState.AvatarColor);
     }
 
     public PlayerState ToPlayerState()
     {
-        return new PlayerState(Name, _score, _numberOfFailedThrows, _scoreHistory.ToArray());
+        return new PlayerState(Name, _score, _numberOfFailedThrows, _scoreHistory.ToArray(), AvatarColor);
     }
 
     public void Reset()

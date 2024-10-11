@@ -21,7 +21,7 @@ public class Game
 
     private Game(IEnumerable<Player> players, MaximumPointsStrategies maximumPointsStrategy, MissedThrowsStrategies missedThrowsStrategy)
     {
-        _players = ShufflePlayers(players);
+        _players = players.ToList();
         _maximumPointsStrategy = maximumPointsStrategy;
         _missedThrowsStrategy = missedThrowsStrategy;
         Players = _players.Where(_ => _.CanPlay).ToList();
@@ -91,11 +91,6 @@ public class Game
         
         CurrentPlayer.AddPoints(score, _maximumPointsStrategy, _missedThrowsStrategy);
         EvaluatePlayers();
-    }
-
-    private static List<Player> ShufflePlayers(IEnumerable<Player> players)
-    {
-        return players.OrderBy(_ => new Random().Next()).ToList();
     }
 
     private void EvaluatePlayers()

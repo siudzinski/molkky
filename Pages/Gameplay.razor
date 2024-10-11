@@ -18,12 +18,14 @@
             </MudGrid>
         </MudItem>
         <MudItem xs="12">
-            <MudPaper Class="p-2" Elevation="1">
-                <MudGrid Justify="Justify.Center">
-                    <MudItem xs="12" sm="6">
-                        <MudText Typo="Typo.h6" Align="Align.Center">Player: @game?.CurrentPlayer?.Name</MudText>
-                    </MudItem>
-                </MudGrid>
+            <MudPaper Class="pa-4" Elevation="1">
+                @if (game?.CurrentPlayer != null)
+                {
+                    <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="4">
+                        <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), game.CurrentPlayer.AvatarColor, true))">@game.CurrentPlayer.FirstLetter</MudAvatar>
+                        <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
+                    </MudStack>
+                }
             </MudPaper>
         </MudItem>
         <Keyboard OnScoreAdded="AddScore" />
@@ -37,7 +39,7 @@
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="4">
-                                    <MudAvatar Size="Size.Large" Color="Color.Success">@player.FirstLetter</MudAvatar>
+                                    <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), player.AvatarColor, true))">@player.FirstLetter</MudAvatar>
                                 </MudItem>
                                 <MudItem xs="8">
                                     <MudGrid>

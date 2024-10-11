@@ -62,7 +62,8 @@
         if(GameStorage is not null && SettingsStorage is not null)
         {
             var (maximumPointsStrategy, missedThrowsStrategy) = await SettingsStorage.LoadSettingsState();
-            var game = Game.CreateNew(playerNames.Select(name => Player.CreateNew(name)), maximumPointsStrategy, missedThrowsStrategy);
+            var players = playerNames.OrderBy(_ => new Random().Next()).Select(name => Player.CreateNew(name));
+            var game = Game.CreateNew(players, maximumPointsStrategy, missedThrowsStrategy);
             await GameStorage.SaveGameState(game);
         }
 
