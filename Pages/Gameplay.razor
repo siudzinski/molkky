@@ -88,7 +88,7 @@
                 {
                     <MudItem xs="12" sm="6" md="4">
                     <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
-                        <MudAvatar Size="Size.Large" Color="Color.Tertiary">@loser.FirstLetter</MudAvatar>
+                        <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), loser.AvatarColor, true))">@loser.FirstLetter</MudAvatar>
                         @loser.Name
                     </MudChip>
                 </MudItem>
