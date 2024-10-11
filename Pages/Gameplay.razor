@@ -21,10 +21,28 @@
             <MudPaper Class="pa-4" Elevation="1">
                 @if (game?.CurrentPlayer != null)
                 {
-                    <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="4">
-                        <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), game.CurrentPlayer.AvatarColor, true))">@game.CurrentPlayer.FirstLetter</MudAvatar>
-                        <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
-                    </MudStack>
+                    <MudGrid>
+                        <MudItem xs="4">
+                            <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), game.CurrentPlayer.AvatarColor, true))">@game.CurrentPlayer.FirstLetter</MudAvatar>
+                        </MudItem>
+                        <MudItem xs="8">
+                            <MudGrid>
+                                <MudItem xs="8">
+                                    <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
+                                    <MudText>Score: @game.CurrentPlayer.Score</MudText>
+                                </MudItem>
+                                <MudItem xs="4">
+                                    @if (game.CurrentPlayer.InDanger)
+                                    {
+                                        @for(int i = 0; i < game.CurrentPlayer.NumberOfFailedThrows; i++)
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
+                                        }
+                                    }
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
                 }
             </MudPaper>
         </MudItem>
