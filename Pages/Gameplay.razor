@@ -1,6 +1,7 @@
 ﻿@page "/gameplay"
 @using Domain;
 @using Infrastructure;
+@inherits TranslatableComponentBase
 @inject NavigationManager NavigationManager
 
 <PageTitle>Game</PageTitle>
@@ -13,7 +14,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.Alarm" />
                 </MudItem>
                 <MudItem>
-                    <MudText>Round: @game?.RoundNumber</MudText>
+                    <MudText>@Translator.Get("RoundLabel"): @game?.RoundNumber</MudText>
                 </MudItem>
             </MudGrid>
         </MudItem>
@@ -29,7 +30,7 @@
                             <MudGrid>
                                 <MudItem xs="8">
                                     <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
-                                    <MudText>Score: @game.CurrentPlayer.Score</MudText>
+                                    <MudText>@Translator.Get("ScoreLabel"): @game.CurrentPlayer.Score</MudText>
                                 </MudItem>
                                 <MudItem xs="4">
                                     @if (game.CurrentPlayer.InDanger)
@@ -63,7 +64,7 @@
                                     <MudGrid>
                                         <MudItem xs="8">
                                             <MudText Typo="Typo.h6">@player.Name</MudText>
-                                            <MudText>Score: @player.Score</MudText>
+                                            <MudText>@Translator.Get("ScoreLabel"): @player.Score</MudText>
                                         </MudItem>
                                         <MudItem xs="4" >
                                             @if (player.InDanger)

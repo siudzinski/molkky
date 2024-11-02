@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@using Infrastructure;
+@inject Translator Translator
 
 <MudThemeProvider @bind-IsDarkMode="@_darkTheme" />
 <MudDialogProvider />
@@ -7,15 +9,21 @@
 <MudLayout>
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        Molkky
+        <MudText Typo="Typo.h6" Class="ml-3">Molkky</MudText>
+        <MudSpacer />
+        <MudIconButton OnClick="LanguageToggle" Color="Color.Inherit" Edge="Edge.End" Class="pt-5">
+            <MudImage Src="@(_isDefaultLanguage ? "flags/uk.png" : "flags/pl.png")"
+                      Width="24" Height="24" ObjectFit="ObjectFit.Cover" 
+                      Alt="@(_isDefaultLanguage ? "English" : "Polski")" />
+        </MudIconButton>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Molkky</MudText>
         </MudDrawerHeader>
         <MudNavMenu>
-            <MudNavLink Href="" Match="NavLinkMatch.All">New game</MudNavLink>
-            <MudNavLink Href="settings" Match="NavLinkMatch.All">Settings</MudNavLink>
+            <MudNavLink Href="" Match="NavLinkMatch.All">@Translator.Get("NewGameNavLink")</MudNavLink>
+            <MudNavLink Href="settings" Match="NavLinkMatch.All">@Translator.Get("SettingsNavLink")</MudNavLink>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
@@ -26,9 +34,21 @@
 @code {
     bool _drawerOpen = true;
     bool _darkTheme = true;
+    bool _isDefaultLanguage = true;
+
+    protected override void OnInitialized()
+    {
+        _isDefaultLanguage = Translator.Language == Translations.English;
+    }
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    void LanguageToggle()
+    {
+        _isDefaultLanguage = !_isDefaultLanguage;
+        Translator.SetLanguage(_isDefaultLanguage ? Translations.English : Translations.Polish);
     }
 }

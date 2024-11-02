@@ -1,10 +1,12 @@
+@inherits TranslatableComponentBase
+
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h6" Align="Align.Center">Add score @Score?</MudText>
+        <MudText Typo="Typo.h6" Align="Align.Center">@Translator.Get("AddScoreLabel") @Score?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Confirm</MudButton>
+        <MudButton OnClick="Cancel">@Translator.Get("CancelButton")</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">@Translator.Get("ConfirmButton")</MudButton>
     </DialogActions>
 </MudDialog>
 

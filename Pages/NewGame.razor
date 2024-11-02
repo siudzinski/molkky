@@ -1,14 +1,15 @@
 @page "/"
 @using Domain;
 @using Infrastructure;
+@inherits TranslatableComponentBase
 @inject NavigationManager NavigationManager
 
-<PageTitle>New game</PageTitle>
+<PageTitle>@Translator.Get("NewGameLabel")</PageTitle>
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
         <MudItem xs="12" sm="12" md="12">
-            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">New Game</MudText>
+            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">@Translator.Get("NewGameLabel")</MudText>
         </MudItem>
         @foreach(var name in playerNames)
         {
@@ -20,15 +21,15 @@
             </MudItem>
         }
         <MudItem xs="12" sm="12" md="12">
-            <MudTextField @bind-Value="playerName" Label="Enter player name" Variant="Variant.Outlined" 
+            <MudTextField @bind-Value="playerName" Label="@Translator.Get("EnterPlayerNameLabel")" Variant="Variant.Outlined" 
                           Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.PersonOutline"
                           @onkeyup="HandleKeyPress" />
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="AddPlayer">Add</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="AddPlayer">@Translator.Get("AddPlayerButton")</MudButton>
         </MudItem>
         <MudItem xs="12" sm="12" md="12">
-            <MudButton Variant="Variant.Filled" OnClick="StartGame" FullWidth="true" Color="Color.Primary" Disabled="@StartGameDisabled">Start Game</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="StartGame" FullWidth="true" Color="Color.Primary" Disabled="@StartGameDisabled">@Translator.Get("StartGameButton")</MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>
