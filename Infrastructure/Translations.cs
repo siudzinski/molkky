@@ -19,7 +19,14 @@ public static class Translations
             ["ScoreLabel"] = "Score",
             ["CancelButton"] = "Cancel",
             ["ConfirmButton"] = "Confirm",
-            ["AddScoreLabel"] = "Add score"
+            ["AddScoreLabel"] = "Add score",
+            ["SettingsLabel"] = "Settings",
+            ["MaxScoreSettingDescription"] = "What happens when player scores more than maximum points?",
+            ["MaxScoreSettingOption_MaxScoreInHalf"] = "Max score in half",
+            ["MaxScoreSettingOption_BackToZero"] = "Back to zero",
+            ["MissedThrowsSettingDescription"] = "What happens when a player throws 3 misses in a row?",
+            ["MissedThrowsSettingOption_Disqualified"] = "Disqualified",
+            ["MissedThrowsSettingOption_BackToZero"] = "Back to zero"
         },
         [Polish] = new()
         {
@@ -33,7 +40,14 @@ public static class Translations
             ["ScoreLabel"] = "Wynik",
             ["CancelButton"] = "Anuluj",
             ["ConfirmButton"] = "Potwierdź",
-            ["AddScoreLabel"] = "Dodać wynik"
+            ["AddScoreLabel"] = "Dodać wynik",
+            ["SettingsLabel"] = "Ustawienia",
+            ["MaxScoreSettingDescription"] = "Co się stanie jeśli gracz przekroczy maksymalną liczbę punktów?",
+            ["MaxScoreSettingOption_MaxScoreInHalf"] = "Maksymalny wynik dzielimy na pół",
+            ["MaxScoreSettingOption_BackToZero"] = "Wraca do zera",
+            ["MissedThrowsSettingDescription"] = "Co się stanie jeśli gracz spudłuje trzy razy pod rząd?",
+            ["MissedThrowsSettingOption_Disqualified"] = "Dyskwalifikacja",
+            ["MissedThrowsSettingOption_BackToZero"] = "Wraca do zera"
         }
     };
 }
