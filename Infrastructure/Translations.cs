@@ -26,7 +26,10 @@ public static class Translations
             ["MaxScoreSettingOption_BackToZero"] = "Back to zero",
             ["MissedThrowsSettingDescription"] = "What happens when a player throws 3 misses in a row?",
             ["MissedThrowsSettingOption_Disqualified"] = "Disqualified",
-            ["MissedThrowsSettingOption_BackToZero"] = "Back to zero"
+            ["MissedThrowsSettingOption_BackToZero"] = "Back to zero",
+            ["PlayAgainLabel"] = "Play again",
+            ["WinnerHeaderText"] = "won the game",
+            ["EndgameLabel"] = "Endgame"
         },
         [Polish] = new()
         {
@@ -47,7 +50,10 @@ public static class Translations
             ["MaxScoreSettingOption_BackToZero"] = "Wraca do zera",
             ["MissedThrowsSettingDescription"] = "Co się stanie jeśli gracz spudłuje trzy razy pod rząd?",
             ["MissedThrowsSettingOption_Disqualified"] = "Dyskwalifikacja",
-            ["MissedThrowsSettingOption_BackToZero"] = "Wraca do zera"
+            ["MissedThrowsSettingOption_BackToZero"] = "Wraca do zera",
+            ["PlayAgainLabel"] = "Zagraj ponownie",
+            ["WinnerHeaderText"] = "wygrał rozgrywkę",
+            ["EndgameLabel"] = "Podsumowanie"
         }
     };
 }
