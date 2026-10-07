@@ -134,6 +134,15 @@ public class PlayerTests
         Assert.False(player.InDanger);
     }
 
+    // The endgame chart is drawn from the score history, so it must follow the reset to 0.
+    [Fact]
+    public void Three_misses_in_a_row_record_0_in_the_score_history_when_set_to_back_to_zero()
+    {
+        var player = Throws(MaxScoreInHalf, MissedThrowsStrategies.BackToZero, 20, 0, 0, 0, 5);
+
+        Assert.Equal(new[] { 20, 20, 20, 0, 5 }, player.ScoreHistory);
+    }
+
     [Fact]
     public void Reset_clears_score_misses_and_history()
     {
