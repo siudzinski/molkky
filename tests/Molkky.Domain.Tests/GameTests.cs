@@ -257,4 +257,32 @@ public class GameTests
 
         Assert.Throws<InvalidOperationException>(game.ToStats);
     }
+
+    [Theory]
+    [InlineData]
+    [InlineData("Ala")]
+    public void A_game_needs_at_least_two_players(params string[] names)
+    {
+        Assert.Throws<ArgumentException>(() => NewGame(names));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Every_player_needs_a_name(string name)
+    {
+        Assert.Throws<ArgumentException>(() => NewGame("Ala", name));
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(13)]
+    public void A_throw_scores_0_to_12(int points)
+    {
+        var game = NewGame("Ala", "Bob");
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => game.Throw(points));
+        Assert.Equal(0, game.Throw(0).Players.Single(p => p.Name == "Ala").Score);
+        Assert.Equal(12, game.Throw(12).Players.Single(p => p.Name == "Ala").Score);
+    }
 }

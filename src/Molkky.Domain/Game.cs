@@ -10,6 +10,7 @@ namespace Molkky.Domain;
 public sealed class Game
 {
     public const int PointsToWin = 50;
+    public const int MaxPointsPerThrow = 12;
 
     private readonly IReadOnlyList<Seat> _seats;
     private readonly ImmutableList<int> _throws;
@@ -29,6 +30,9 @@ public sealed class Game
 
     private Game(GameSettings settings, IReadOnlyList<Seat> seats, ImmutableList<int> throws)
     {
+        if (seats.Count < 2) throw new ArgumentException("A game needs at least 2 players.", nameof(seats));
+        if (seats.Any(seat => string.IsNullOrWhiteSpace(seat.Name))) throw new ArgumentException("Every player needs a name.", nameof(seats));
+
         Settings = settings;
         _seats = seats;
         _throws = throws;
@@ -39,6 +43,7 @@ public sealed class Game
 
         foreach (var points in throws)
         {
+            CheckPoints(points);
             var active = order.Where(player => player.CanPlay).ToList();
             if (WinnerAmong(active) is not null) throw new ArgumentException("A throw after the game was won.", nameof(throws));
 
@@ -73,7 +78,11 @@ public sealed class Game
         new(settings, names.Select(name => new Seat(name, ColorProvider.Instance.GetNextColor())).ToList(), []);
 
     // The current player's throw: 0 is a miss, 1-12 a hit. Throws after the game is won are ignored.
-    public Game Throw(int points) => AnyWinner ? this : new Game(Settings, _seats, _throws.Add(points));
+    public Game Throw(int points)
+    {
+        CheckPoints(points);
+        return AnyWinner ? this : new Game(Settings, _seats, _throws.Add(points));
+    }
 
     // Same players and settings, starting in the order they finished in; eliminated players come back.
     public Game PlayAgain() => new(Settings, AllPlayers.Select(player => player.Seat).ToList(), []);
@@ -105,4 +114,10 @@ public sealed class Game
 
     private static Player? WinnerAmong(IReadOnlyList<Player> active) =>
         active.FirstOrDefault(player => player.Score == PointsToWin) ?? (active.Count == 1 ? active[0] : null);
+
+    private static void CheckPoints(int points)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(points);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(points, MaxPointsPerThrow);
+    }
 }
