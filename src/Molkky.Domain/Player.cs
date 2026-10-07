@@ -1,103 +1,74 @@
-using System.Collections.ObjectModel;
-using Molkky.Domain.StorageModels;
+using System.Collections.Immutable;
 
 namespace Molkky.Domain;
 
-public class Player
+// A player's state at one point of a game. Computed by replaying the throws, never stored.
+public sealed class Player
 {
-    private int _score = 0;
-    private int _numberOfFailedThrows = 0;
-    private List<int> _scoreHistory = new();
+    private const int MissesInARowToBeOut = 3;
 
-    public string Name { get; private set; }
+    private readonly ImmutableList<int> _scoreHistory;
+
+    internal Seat Seat { get; }
+
+    public string Name => Seat.Name;
     public string FirstLetter => Name[..1].ToUpper();
-    public string AvatarColor { get; private set; }
-    public int Score => _score;
-    public ReadOnlyCollection<int> ScoreHistory => _scoreHistory.AsReadOnly();
-    public int NumberOfFailedThrows => _numberOfFailedThrows;
-    public bool InDanger => _numberOfFailedThrows > 0;
-    public bool CanPlay => _numberOfFailedThrows < 3;
+    public string AvatarColor => Seat.AvatarColor;
+    public int Score { get; }
+    // The score after each of this player's throws.
+    public IReadOnlyList<int> ScoreHistory => _scoreHistory;
+    public int NumberOfFailedThrows { get; }
+    public bool InDanger => NumberOfFailedThrows > 0;
+    public bool CanPlay => NumberOfFailedThrows < MissesInARowToBeOut;
 
-    private Player(string name)
+    private Player(Seat seat, int score, int numberOfFailedThrows, ImmutableList<int> scoreHistory)
     {
-        Name = name;
-        AvatarColor = ColorProvider.Instance.GetNextColor();
+        Seat = seat;
+        Score = score;
+        NumberOfFailedThrows = numberOfFailedThrows;
+        _scoreHistory = scoreHistory;
     }
 
-    private Player(string name, int score, int numberOfFailedThrows, int[] scoreHistory, string avatarColor)
-    {
-        Name = name;
-        _score = score;
-        _numberOfFailedThrows = numberOfFailedThrows;
-        _scoreHistory = scoreHistory.ToList();
-        AvatarColor = avatarColor;
-    }
+    internal static Player AtStart(Seat seat) => new(seat, 0, 0, []);
 
-    public static Player CreateNew(string name)
-    {
-        return new Player(name);
-    }
+    public static Player CreateNew(string name) => AtStart(new Seat(name, ColorProvider.Instance.GetNextColor()));
 
-    public static Player FromPlayerState(PlayerState playerState)
+    // The player after one more throw. An eliminated player ignores throws.
+    public Player Throw(int points, GameSettings settings)
     {
-        return new Player(playerState.Name, playerState.Score, playerState.NumberOfFailedThrows, playerState.ScoreHistory, playerState.AvatarColor);
-    }
+        if (!CanPlay) return this;
 
-    public PlayerState ToPlayerState()
-    {
-        return new PlayerState(Name, _score, _numberOfFailedThrows, _scoreHistory.ToArray(), AvatarColor);
-    }
+        var score = Score;
+        var failedThrows = NumberOfFailedThrows;
 
-    public void Reset()
-    {
-        _score = 0;
-        _numberOfFailedThrows = 0;
-        _scoreHistory = new();
-    }
-
-    public void AddPoints(
-        int score,
-        MaximumPointsStrategies maximumPointsStrategy,
-        MissedThrowsStrategies missedThrowsStrategy)
-    {
-        if (!CanPlay) return;
-
-        if (score > 0)
+        if (points > 0)
         {
-            _score += score;
-            _numberOfFailedThrows = 0;
-            if (_score > 50)
+            score += points;
+            failedThrows = 0;
+            if (score > Game.PointsToWin)
             {
                 //TODO inject strategy instead of enum
-                if (maximumPointsStrategy == MaximumPointsStrategies.MaxScoreInHalf)
+                if (settings.MaximumPoints == MaximumPointsStrategies.MaxScoreInHalf)
                 {
-                    _score = 25;
+                    score = 25;
                 }
-                if (maximumPointsStrategy == MaximumPointsStrategies.BackToZero)
+                if (settings.MaximumPoints == MaximumPointsStrategies.BackToZero)
                 {
-                    _score = 0;
+                    score = 0;
                 }
             }
         }
         else
         {
+            failedThrows++;
             //TODO inject strategy instead of enum
-            if (missedThrowsStrategy == MissedThrowsStrategies.Disqualified)
+            if (settings.MissedThrows == MissedThrowsStrategies.BackToZero && failedThrows == MissesInARowToBeOut)
             {
-                _numberOfFailedThrows++;
-            }
-            if (missedThrowsStrategy == MissedThrowsStrategies.BackToZero)
-            {
-                _numberOfFailedThrows++;
-                if (_numberOfFailedThrows == 3)
-                {
-                    _numberOfFailedThrows = 0;
-                    _score = 0;
-                }
+                failedThrows = 0;
+                score = 0;
             }
         }
 
-        // Record the score itself, not a running sum, so the history follows every reset.
-        _scoreHistory.Add(_score);
+        return new Player(Seat, score, failedThrows, _scoreHistory.Add(score));
     }
 }

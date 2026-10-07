@@ -13,7 +13,7 @@ public class PlayerTests
         var player = Player.CreateNew("ala");
         foreach (var points in throws)
         {
-            player.AddPoints(points, maximumPoints, missedThrows);
+            player = player.Throw(points, new GameSettings(maximumPoints, missedThrows));
         }
 
         return player;
@@ -64,7 +64,7 @@ public class PlayerTests
         Assert.Equal(droppedTo, player.Score);
         Assert.Equal(new[] { 12, 24, 36, 48, droppedTo }, player.ScoreHistory);
 
-        player.AddPoints(10, maximumPoints, Disqualified);
+        player = player.Throw(10, new GameSettings(maximumPoints, Disqualified));
 
         Assert.Equal(droppedTo + 10, player.Score);
         Assert.Equal(droppedTo + 10, player.ScoreHistory[^1]);
@@ -94,8 +94,8 @@ public class PlayerTests
         Assert.Equal(0, player.NumberOfFailedThrows);
         Assert.False(player.InDanger);
 
-        player.AddPoints(0, MaxScoreInHalf, missedThrows);
-        player.AddPoints(0, MaxScoreInHalf, missedThrows);
+        player = player.Throw(0, new GameSettings(MaxScoreInHalf, missedThrows));
+        player = player.Throw(0, new GameSettings(MaxScoreInHalf, missedThrows));
 
         Assert.Equal(2, player.NumberOfFailedThrows);
         Assert.True(player.CanPlay);
@@ -117,7 +117,7 @@ public class PlayerTests
     {
         var player = Throws(MaxScoreInHalf, Disqualified, 20, 0, 0, 0);
 
-        player.AddPoints(5, MaxScoreInHalf, Disqualified);
+        player = player.Throw(5, new GameSettings(MaxScoreInHalf, Disqualified));
 
         Assert.Equal(20, player.Score);
         Assert.Equal(new[] { 20, 20, 20, 20 }, player.ScoreHistory);
@@ -143,12 +143,20 @@ public class PlayerTests
         Assert.Equal(new[] { 20, 20, 20, 0, 5 }, player.ScoreHistory);
     }
 
+    // Was Player.Reset; a player is reset by starting the game again. Ala scores 12 (a game throw is
+    // at most 12) and is eliminated, while Bob and Cyd keep the game going.
     [Fact]
     public void Reset_clears_score_misses_and_history()
     {
-        var player = Throws(MaxScoreInHalf, Disqualified, 20, 0, 0, 0);
+        var game = Game.CreateNew(["ala", "bob", "cyd"], new GameSettings(MaxScoreInHalf, Disqualified));
+        // From round 2 on, ala has the highest score and throws last.
+        foreach (var points in new[] { 12, 1, 1, /* round 2 */ 1, 1, 0, /* round 3 */ 1, 1, 0, /* round 4 */ 1, 1, 0 })
+        {
+            game = game.Throw(points);
+        }
+        Assert.Equal(["ala"], game.Losers.Select(p => p.Name));
 
-        player.Reset();
+        var player = game.PlayAgain().AllPlayers.Single(p => p.Name == "ala");
 
         Assert.Equal(0, player.Score);
         Assert.Equal(0, player.NumberOfFailedThrows);

@@ -1,113 +1,108 @@
+using System.Collections.Immutable;
 using Molkky.Domain.StorageModels;
 
 namespace Molkky.Domain;
 
-public class Game
+// A game is its settings, the players in their starting order and the throws so far. Everything
+// else (scores, misses, eliminations, round, current player, winner, chart data) is computed by
+// replaying the throws, so a game never holds state that could disagree with its throws.
+// Immutable: a throw or a new round returns a new Game.
+public sealed class Game
 {
-    private const int PointsRequiredToWin = 50;
+    public const int PointsToWin = 50;
 
-    public List<Player> Players { get; private set; }
-    public List<Player> Losers { get; private set; } = new List<Player>();
-    public Player CurrentPlayer => Players[_numberOfThrowsInRound];
-    public Player? Winner => Players.FirstOrDefault(_ => _.Score == PointsRequiredToWin) ?? (Players.Count > 1 ? null : Players.First());
+    private readonly IReadOnlyList<Seat> _seats;
+    private readonly ImmutableList<int> _throws;
+
+    public GameSettings Settings { get; }
+    public IReadOnlyList<int> Throws => _throws;
+
+    // Everyone, eliminated players included, in the current order.
+    public IReadOnlyList<Player> AllPlayers { get; }
+    // The players still in the game, in throwing order.
+    public IReadOnlyList<Player> Players { get; }
+    public IReadOnlyList<Player> Losers { get; }
+    public Player CurrentPlayer { get; }
+    public Player? Winner { get; }
     public bool AnyWinner => Winner is not null;
-    public int RoundNumber => _roundNumber;
+    public int RoundNumber { get; }
 
-    private List<Player> _players;
-    private int _numberOfThrowsInRound = 0;
-    private int _roundNumber = 1;
-    private readonly MaximumPointsStrategies _maximumPointsStrategy;
-    private readonly MissedThrowsStrategies _missedThrowsStrategy;
-
-    private Game(IEnumerable<Player> players, MaximumPointsStrategies maximumPointsStrategy, MissedThrowsStrategies missedThrowsStrategy)
+    private Game(GameSettings settings, IReadOnlyList<Seat> seats, ImmutableList<int> throws)
     {
-        _players = players.ToList();
-        _maximumPointsStrategy = maximumPointsStrategy;
-        _missedThrowsStrategy = missedThrowsStrategy;
-        Players = _players.Where(_ => _.CanPlay).ToList();
-        Losers = _players.Where(_ => !_.CanPlay).ToList();
-    }
+        Settings = settings;
+        _seats = seats;
+        _throws = throws;
 
-    private Game(
-        IEnumerable<Player> players,
-        MaximumPointsStrategies maximumPointsStrategy,
-        MissedThrowsStrategies missedThrowsStrategy,
-        int numberOfThrowsInRound,
-        int roundNumber) : this(players, maximumPointsStrategy, missedThrowsStrategy)
-    {
-        _numberOfThrowsInRound = numberOfThrowsInRound;
-        _roundNumber = roundNumber;
-    }
+        var order = seats.Select(Player.AtStart).ToList();
+        var throwsInRound = 0;
+        var round = 1;
 
-    public static Game CreateNew(
-        IEnumerable<Player> players,
-        MaximumPointsStrategies maximumPointsStrategy,
-        MissedThrowsStrategies missedThrowsStrategy)
-    {
-        return new Game(players, maximumPointsStrategy, missedThrowsStrategy);
-    }
-
-    public void PlayAgain()
-    {
-        _roundNumber = 1;
-        _numberOfThrowsInRound = 0;
-        foreach (var player in _players)
+        foreach (var points in throws)
         {
-            player.Reset();
+            var active = order.Where(player => player.CanPlay).ToList();
+            if (WinnerAmong(active) is not null) throw new ArgumentException("A throw after the game was won.", nameof(throws));
+
+            var thrower = active[throwsInRound];
+            var afterThrow = thrower.Throw(points, settings);
+            order[order.IndexOf(thrower)] = afterThrow;
+
+            // An eliminated thrower leaves the list, so the next player moves into their place.
+            if (afterThrow.CanPlay)
+            {
+                throwsInRound++;
+            }
+
+            if (throwsInRound == order.Count(player => player.CanPlay))
+            {
+                throwsInRound = 0;
+                order = order.OrderBy(player => player.Score).ToList();
+                round++;
+            }
         }
+
+        AllPlayers = order;
+        Players = order.Where(player => player.CanPlay).ToList();
+        Losers = order.Where(player => !player.CanPlay).ToList();
+        CurrentPlayer = Players[throwsInRound];
+        Winner = WinnerAmong(Players);
+        RoundNumber = round;
     }
 
-    public static Game FromGameState(GameState gameState)
-    {
-        return new Game(
-            gameState.Players.Select(Player.FromPlayerState),
-            gameState.MaximumPointsStrategy,
-            gameState.MissedThrowsStrategy,
-            gameState.NumberOfThrowsInRound,
-            gameState.RoundNumber);
-    }
+    // Players throw in the given order.
+    public static Game CreateNew(IEnumerable<string> names, GameSettings settings) =>
+        new(settings, names.Select(name => new Seat(name, ColorProvider.Instance.GetNextColor())).ToList(), []);
 
-    public GameState ToGameState()
-    {
-        return new GameState(
-            _players.Select(p => p.ToPlayerState()), _maximumPointsStrategy, _missedThrowsStrategy, _numberOfThrowsInRound, _roundNumber);
-    }
+    // The current player's throw: 0 is a miss, 1-12 a hit. Throws after the game is won are ignored.
+    public Game Throw(int points) => AnyWinner ? this : new Game(Settings, _seats, _throws.Add(points));
+
+    // Same players and settings, starting in the order they finished in; eliminated players come back.
+    public Game PlayAgain() => new(Settings, AllPlayers.Select(player => player.Seat).ToList(), []);
+
+    public static Game FromGameState(GameState gameState) =>
+        new(
+            new GameSettings(gameState.MaximumPointsStrategy, gameState.MissedThrowsStrategy),
+            gameState.Players.Select(player => new Seat(player.Name, player.AvatarColor)).ToList(),
+            [.. gameState.Throws]);
+
+    public GameState ToGameState() =>
+        new(
+            _seats.Select(seat => new PlayerState(seat.Name, seat.AvatarColor)),
+            Settings.MaximumPoints,
+            Settings.MissedThrows,
+            [.. _throws]);
 
     public Stats ToStats()
     {
         if (Winner is null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("The game has no winner yet.");
         }
 
-        var players = _players.Select(p => new PlayerStats(p.Name, p.ScoreHistory));
+        var players = AllPlayers.Select(p => new PlayerStats(p.Name, p.ScoreHistory));
 
-        return new Stats(Winner.Name, players, _roundNumber);
+        return new Stats(Winner.Name, players, RoundNumber);
     }
 
-    public void SetThrowScoreForCurrentPlayer(int score)
-    {
-        if (Winner is not null) return;
-
-        CurrentPlayer.AddPoints(score, _maximumPointsStrategy, _missedThrowsStrategy);
-        EvaluatePlayers();
-    }
-
-    private void EvaluatePlayers()
-    {
-        if (CurrentPlayer.CanPlay)
-        {
-            _numberOfThrowsInRound++;
-        }
-
-        if (_numberOfThrowsInRound == _players.Where(_ => _.CanPlay).Count())
-        {
-            _numberOfThrowsInRound = 0;
-            _players = _players.OrderBy(_ => _.Score).ToList();
-            _roundNumber++;
-        }
-
-        Players = _players.Where(_ => _.CanPlay).ToList();
-        Losers = _players.Where(_ => !_.CanPlay).ToList();
-    }
+    private static Player? WinnerAmong(IReadOnlyList<Player> active) =>
+        active.FirstOrDefault(player => player.Score == PointsToWin) ?? (active.Count == 1 ? active[0] : null);
 }
