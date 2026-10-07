@@ -6,7 +6,7 @@ namespace Molkky.Domain;
 // A game is its settings, the players in their starting order and the throws so far. Everything
 // else (scores, misses, eliminations, round, current player, winner, chart data) is computed by
 // replaying the throws, so a game never holds state that could disagree with its throws.
-// Immutable: a throw or a new round returns a new Game.
+// Immutable: a throw, an undo or a new round returns a new Game.
 public sealed class Game
 {
     public const int PointsToWin = 50;
@@ -83,6 +83,11 @@ public sealed class Game
         CheckPoints(points);
         return AnyWinner ? this : new Game(Settings, _seats, _throws.Add(points));
     }
+
+    public bool CanUndo => !_throws.IsEmpty;
+
+    // Drops the last throw; the replay puts back everything it changed.
+    public Game Undo() => CanUndo ? new Game(Settings, _seats, _throws.RemoveAt(_throws.Count - 1)) : this;
 
     // Same players and settings, starting in the order they finished in; eliminated players come back.
     public Game PlayAgain() => new(Settings, AllPlayers.Select(player => player.Seat).ToList(), []);
