@@ -30,10 +30,8 @@ public class Translator
         OnLanguageChanged?.Invoke();
     }
 
-    public string Get(string key)
-    {
-        return Translations.Items[Language][key];
-    }
+    // Every visible string in the current language.
+    public Texts Text => Translations.For(Language);
 
     private void SaveLanguage()
     {

@@ -4,7 +4,7 @@
 @inherits TranslatableComponentBase
 @inject NavigationManager NavigationManager
 
-<PageTitle>@Translator.Get("EndgameLabel")</PageTitle>
+<PageTitle>@Text.EndgameLabel</PageTitle>
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
@@ -12,7 +12,7 @@
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
         </MudItem>
         <MudItem xs="8">
-            <MudText Align="Align.Center" Typo="Typo.h5">@Winner @Translator.Get("WinnerHeaderText")!</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h5">@Winner @(Text.WinnerHeaderText)!</MudText>
         </MudItem>
         <MudItem xs="2">
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
@@ -21,10 +21,10 @@
             <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="@Options" Width="100%" CanHideSeries/>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">@Translator.Get("PlayAgainLabel")</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">@Text.PlayAgainLabel</MudButton>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">@Translator.Get("NewGameLabel")</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">@Text.NewGameLabel</MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>

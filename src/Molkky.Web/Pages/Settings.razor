@@ -5,31 +5,31 @@
 
 @page "/settings"
 
-<PageTitle>@Translator.Get("SettingsLabel")</PageTitle>
+<PageTitle>@Text.SettingsLabel</PageTitle>
 
 <MudContainer Class="mt-8 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
         <MudItem xs="12">
-            <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">@Translator.Get("SettingsLabel")</MudText>
+            <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">@Text.SettingsLabel</MudText>
         </MudItem>
         <MudDivider />
         <MudItem xs="12">
-            <MudText>@Translator.Get("MaxScoreSettingDescription")</MudText>
+            <MudText>@Text.MaxScoreSettingDescription</MudText>
         </MudItem>
         <MudItem xs="12">
             <MudRadioGroup @bind-Value="@MaximumPointsStrategy">
-                <MudRadio Value="@MaximumPointsStrategies.MaxScoreInHalf.ToString()" Color="Color.Primary">@Translator.Get("MaxScoreSettingOption_MaxScoreInHalf")</MudRadio>
-                <MudRadio Value="@MaximumPointsStrategies.BackToZero.ToString()" Color="Color.Primary">@Translator.Get("MaxScoreSettingOption_BackToZero")</MudRadio>
+                <MudRadio Value="@MaximumPointsStrategies.MaxScoreInHalf.ToString()" Color="Color.Primary">@Text.MaxScoreInHalfOption</MudRadio>
+                <MudRadio Value="@MaximumPointsStrategies.BackToZero.ToString()" Color="Color.Primary">@Text.MaxScoreBackToZeroOption</MudRadio>
             </MudRadioGroup>
         </MudItem>
         <MudDivider />
         <MudItem xs="12">
-            <MudText>@Translator.Get("MissedThrowsSettingDescription")</MudText>
+            <MudText>@Text.MissedThrowsSettingDescription</MudText>
         </MudItem>
         <MudItem xs="12">
             <MudRadioGroup @bind-Value="@MissedThrowsStrategy">
-                <MudRadio Value="@MissedThrowsStrategies.Disqualified.ToString()" Color="Color.Primary">@Translator.Get("MissedThrowsSettingOption_Disqualified")</MudRadio>
-                <MudRadio Value="@MissedThrowsStrategies.BackToZero.ToString()" Color="Color.Primary">@Translator.Get("MissedThrowsSettingOption_BackToZero")</MudRadio>
+                <MudRadio Value="@MissedThrowsStrategies.Disqualified.ToString()" Color="Color.Primary">@Text.MissedThrowsDisqualifiedOption</MudRadio>
+                <MudRadio Value="@MissedThrowsStrategies.BackToZero.ToString()" Color="Color.Primary">@Text.MissedThrowsBackToZeroOption</MudRadio>
             </MudRadioGroup>
         </MudItem>
         <MudDivider />

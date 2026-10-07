@@ -24,7 +24,7 @@ Blazor WebAssembly (.NET 10) app for keeping score in Mölkky, served as a stati
 - The domain stays free of UI: no Blazor, JS interop or MudBlazor in `Molkky.Domain`. The project has no such references and `DomainDependencyTests` guards it.
 - Every rule change gets a test in `Molkky.Domain.Tests`, written first and seen red.
 - Re-sorting players by lowest score after each round is a deliberate house rule, not the official fixed order. Keep it and its tests.
-- Every visible string goes through `Translator.Get` with a key in both languages in `Infrastructure/Translations.cs`; `TranslationsTests` checks the key sets match.
+- Every visible string is a `required` property of `Texts` in `Infrastructure/Translations.cs`, set in both languages (a missing one fails the build). Components read it as `@Text.Name` (from `TranslatableComponentBase`), other code as `Translator.Text.Name`.
 - MudBlazor is pinned at 6.19.1 until phase 4; its API changed a lot since, so follow how this repo already uses it. Persistence is sessionStorage until phase 3.
 - Package versions live only in `Directory.Packages.props`; a csproj `PackageReference` has no `Version`.
 - Warnings are errors (`Directory.Build.props`).

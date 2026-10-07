@@ -14,7 +14,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.Alarm" />
                 </MudItem>
                 <MudItem>
-                    <MudText>@Translator.Get("RoundLabel"): @game?.RoundNumber</MudText>
+                    <MudText>@Text.RoundLabel: @game?.RoundNumber</MudText>
                 </MudItem>
             </MudGrid>
         </MudItem>
@@ -30,7 +30,7 @@
                             <MudGrid>
                                 <MudItem xs="8">
                                     <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
-                                    <MudText>@Translator.Get("ScoreLabel"): @game.CurrentPlayer.Score</MudText>
+                                    <MudText>@Text.ScoreLabel: @game.CurrentPlayer.Score</MudText>
                                 </MudItem>
                                 <MudItem xs="4">
                                     @if (game.CurrentPlayer.InDanger)
@@ -64,7 +64,7 @@
                                     <MudGrid>
                                         <MudItem xs="8">
                                             <MudText Typo="Typo.h6">@player.Name</MudText>
-                                            <MudText>@Translator.Get("ScoreLabel"): @player.Score</MudText>
+                                            <MudText>@Text.ScoreLabel: @player.Score</MudText>
                                         </MudItem>
                                         <MudItem xs="4" >
                                             @if (player.InDanger)
