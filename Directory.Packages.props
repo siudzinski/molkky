@@ -12,4 +12,8 @@
     <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.3" />
   </ItemGroup>
 
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+  </ItemGroup>
+
 </Project>
