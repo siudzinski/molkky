@@ -1,3 +1,5 @@
+using Molkky.Domain.Rules;
+
 namespace Molkky.Domain.Tests;
 
 public class PlayerTests
@@ -13,7 +15,7 @@ public class PlayerTests
         var player = Player.CreateNew("ala");
         foreach (var points in throws)
         {
-            player = player.Throw(points, new GameSettings(maximumPoints, missedThrows));
+            player = player.Throw(points, GameRules.For(new GameSettings(maximumPoints, missedThrows)));
         }
 
         return player;
@@ -64,7 +66,7 @@ public class PlayerTests
         Assert.Equal(droppedTo, player.Score);
         Assert.Equal(new[] { 12, 24, 36, 48, droppedTo }, player.ScoreHistory);
 
-        player = player.Throw(10, new GameSettings(maximumPoints, Disqualified));
+        player = player.Throw(10, GameRules.For(new GameSettings(maximumPoints, Disqualified)));
 
         Assert.Equal(droppedTo + 10, player.Score);
         Assert.Equal(droppedTo + 10, player.ScoreHistory[^1]);
@@ -94,8 +96,8 @@ public class PlayerTests
         Assert.Equal(0, player.NumberOfFailedThrows);
         Assert.False(player.InDanger);
 
-        player = player.Throw(0, new GameSettings(MaxScoreInHalf, missedThrows));
-        player = player.Throw(0, new GameSettings(MaxScoreInHalf, missedThrows));
+        player = player.Throw(0, GameRules.For(new GameSettings(MaxScoreInHalf, missedThrows)));
+        player = player.Throw(0, GameRules.For(new GameSettings(MaxScoreInHalf, missedThrows)));
 
         Assert.Equal(2, player.NumberOfFailedThrows);
         Assert.True(player.CanPlay);
@@ -117,7 +119,7 @@ public class PlayerTests
     {
         var player = Throws(MaxScoreInHalf, Disqualified, 20, 0, 0, 0);
 
-        player = player.Throw(5, new GameSettings(MaxScoreInHalf, Disqualified));
+        player = player.Throw(5, GameRules.For(new GameSettings(MaxScoreInHalf, Disqualified)));
 
         Assert.Equal(20, player.Score);
         Assert.Equal(new[] { 20, 20, 20, 20 }, player.ScoreHistory);

@@ -1,11 +1,12 @@
 using System.Collections.Immutable;
+using Molkky.Domain.Rules;
 
 namespace Molkky.Domain;
 
 // A player's state at one point of a game. Computed by replaying the throws, never stored.
 public sealed class Player
 {
-    private const int MissesInARowToBeOut = 3;
+    internal const int MissesInARowToBeOut = 3;
 
     private readonly ImmutableList<int> _scoreHistory;
 
@@ -33,8 +34,9 @@ public sealed class Player
 
     public static Player CreateNew(string name) => AtStart(new Seat(name, ColorProvider.Instance.GetNextColor()));
 
-    // The player after one more throw. An eliminated player ignores throws.
-    public Player Throw(int points, GameSettings settings)
+    // The player after one more throw: a hit (1-12) adds its points and clears the misses, a miss (0)
+    // counts as a failed throw. An eliminated player ignores throws.
+    public Player Throw(int points, GameRules rules)
     {
         if (!CanPlay) return this;
 
@@ -47,25 +49,15 @@ public sealed class Player
             failedThrows = 0;
             if (score > Game.PointsToWin)
             {
-                //TODO inject strategy instead of enum
-                if (settings.MaximumPoints == MaximumPointsStrategies.MaxScoreInHalf)
-                {
-                    score = 25;
-                }
-                if (settings.MaximumPoints == MaximumPointsStrategies.BackToZero)
-                {
-                    score = 0;
-                }
+                score = rules.MaximumPoints.ScoreAfterGoingOver(score);
             }
         }
         else
         {
             failedThrows++;
-            //TODO inject strategy instead of enum
-            if (settings.MissedThrows == MissedThrowsStrategies.BackToZero && failedThrows == MissesInARowToBeOut)
+            if (failedThrows == MissesInARowToBeOut)
             {
-                failedThrows = 0;
-                score = 0;
+                (score, failedThrows) = rules.MissedThrows.AfterThirdMiss(score);
             }
         }
 

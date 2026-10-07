@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Molkky.Domain.Rules;
 using Molkky.Domain.StorageModels;
 
 namespace Molkky.Domain;
@@ -36,6 +37,7 @@ public sealed class Game
         Settings = settings;
         _seats = seats;
         _throws = throws;
+        var rules = GameRules.For(settings);
 
         var order = seats.Select(Player.AtStart).ToList();
         var throwsInRound = 0;
@@ -48,7 +50,7 @@ public sealed class Game
             if (WinnerAmong(active) is not null) throw new ArgumentException("A throw after the game was won.", nameof(throws));
 
             var thrower = active[throwsInRound];
-            var afterThrow = thrower.Throw(points, settings);
+            var afterThrow = thrower.Throw(points, rules);
             order[order.IndexOf(thrower)] = afterThrow;
 
             // An eliminated thrower leaves the list, so the next player moves into their place.
@@ -60,7 +62,7 @@ public sealed class Game
             if (throwsInRound == order.Count(player => player.CanPlay))
             {
                 throwsInRound = 0;
-                order = order.OrderBy(player => player.Score).ToList();
+                order = rules.RoundOrder.OrderForNextRound(order);
                 round++;
             }
         }
