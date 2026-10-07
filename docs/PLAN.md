@@ -19,11 +19,13 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 | 2026-10-07 | Keep re-sorting players by score (lowest first) after each round | Deliberate house rule, not the official fixed order. Must stay explicit and tested. |
 | 2026-10-07 | Move persistence from `sessionStorage` to `localStorage` | A game survives closing the tab; settings and language are remembered. |
 | 2026-10-07 | Deploy with the official Pages actions (`upload-pages-artifact` + `deploy-pages`) | Built-in token, no personal access token to expire, no `gh-pages` branch. |
+| 2026-10-07 | Tests on xUnit v3 with Microsoft Testing Platform (`test.runner` in `global.json`) | xunit.v3 4.x ships MTP v2 by default, and the .NET 10 SDK runs those projects through `dotnet test` only in MTP mode. |
+| 2026-10-07 | LF line endings in the repo and every working tree (`.gitattributes` + `.editorconfig`) | CI runs on Linux; `dotnet format --verify-no-changes` must give the same answer on Windows. |
 
 ## Known issues (found during review, 2026-10-07)
 
-- **Bug:** with the "3 misses → back to zero" setting, `Player.AddPoints` sets the score to 0 but appends the *previous* total to the score history, so the endgame chart is wrong from that throw onwards. Fix test-first in phase 2.
-- `wwwroot/js/sessionStorage.js` is a no-op (`window.sessionStorage` cannot be reassigned); if it ever took effect, `getItem` would recurse forever. Delete in phase 2.
+- **Fixed in phase 2.** **Bug:** with the "3 misses → back to zero" setting, `Player.AddPoints` set the score to 0 but appended the *previous* total to the score history, so the endgame chart was wrong from that throw onwards. The history now records the score after every throw.
+- **Fixed in phase 2.** `wwwroot/js/sessionStorage.js` was a no-op (`window.sessionStorage` cannot be reassigned); if it ever took effect, `getItem` would recurse forever. Deleted.
 - The domain stores MudBlazor colour names (`ColorProvider`) that the UI parses back with `Enum.Parse(typeof(Color), …)`. Store a palette index instead (phase 3).
 - `Gameplay` and `Settings` save state in `OnAfterRenderAsync`, i.e. on every render. Save on change instead (phase 3).
 - `index.html` sets `user-scalable=no`, which blocks zoom (accessibility). Remove in phase 4.
@@ -39,27 +41,30 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 - [x] `.claude/launch.json` with a `molkky-dev` server so Claude can preview the app (pulled forward from phase 2).
 - [x] Verified locally: published output served under `/molkky/` (base href, Brotli loading, deep-link reload via `404.html`, full game to endgame, settings, language switch) and the dev server.
 - [x] Repo Settings → Pages → Source: **GitHub Actions** (switched 2026-10-07; was "Deploy from a branch: gh-pages").
-- [ ] Merge, confirm the deploy run succeeds and the live site works.
-- [ ] Clean up: delete the `gh-pages` branch and the `DEPLOY_TOKEN` secret.
+- [x] Merge, confirm the deploy run succeeds and the live site works (PR #1, 2026-10-07).
+- [x] Clean up: delete the `gh-pages` branch and the `DEPLOY_TOKEN` secret (2026-10-07; revoking the personal access token itself is left to the account owner).
 
 ## Phase 2: structure and safety net
 
-- [ ] Split into projects:
+- [x] Split into projects:
   - `src/Molkky.Domain`: plain C#, no Blazor or JS interop references (the compiler enforces it).
   - `src/Molkky.Web`: the Blazor app.
   - `tests/Molkky.Domain.Tests` (xUnit v3) and `tests/Molkky.Web.Tests` (bUnit).
-- [ ] PascalCase root namespace (`Molkky.*`), `Directory.Build.props`, central package management (`Directory.Packages.props`), `.editorconfig`.
-- [ ] Characterisation tests for the current rules first: scoring, exceeding 50 (both variants), 3 misses (both variants), elimination, last player standing wins, re-sort by lowest score after each round, play again.
-- [ ] Fix the score-history bug test-first.
-- [ ] Delete `wwwroot/js/sessionStorage.js`.
-- [ ] `CLAUDE.md`:
+- [x] PascalCase root namespace (`Molkky.*`), `Directory.Build.props`, central package management (`Directory.Packages.props`), `.editorconfig`.
+- [x] Characterisation tests for the current rules first: scoring, exceeding 50 (both variants), 3 misses (both variants), elimination, last player standing wins, re-sort by lowest score after each round, play again.
+- [x] Fix the score-history bug test-first.
+- [x] Delete `wwwroot/js/sessionStorage.js`.
+- [x] `CLAUDE.md`:
   - what the app is, the folder layout, and the commands (build, test, run, format, publish);
   - the rules: the domain has no UI dependencies, every rule change gets a test, every visible string is translated;
   - what "done" means: build, tests and format pass, and UI changes are checked in the preview at phone width.
-- [ ] `.claude/settings.json` allowlist for `dotnet build`, `dotnet test` and `dotnet format`.
-- [ ] VS Code (the editor used for this repo): `.vscode/extensions.json` recommending C# Dev Kit, plus `tasks.json`/`launch.json` for run and test.
-- [ ] CI gates on PRs: build, test, `dotnet format --verify-no-changes`, publish.
-- [ ] Update workflow paths for the new project location.
+- [x] `.claude/settings.json` allowlist for `dotnet build`, `dotnet test` and `dotnet format`.
+- [x] VS Code (the editor used for this repo): `.vscode/extensions.json` recommending C# Dev Kit, plus `tasks.json`/`launch.json` for run and test.
+- [x] CI gates on PRs: build, test, `dotnet format --verify-no-changes`, publish.
+- [x] Update workflow paths for the new project location.
+- [x] `.gitattributes` with LF everywhere; `.claude/settings.local.json` git-ignored.
+- [x] `tools/serve-ghpages/serve.cs`: .NET 10 single-file server for the publish output (under `/molkky/`, `404.html` fallback, `/` → `/molkky/`), as `molkky-ghpages` in `.claude/launch.json`.
+- [x] Verified locally: 0 warnings, tests and format check green; game, settings and language survive a reload without `sessionStorage.js`; GHPages publish served under `/molkky/` (base href, Brotli loading, deep link via `404.html`) played to the endgame at phone width, with the chart dropping to 0 after 3 misses.
 
 ## Phase 3: game model rework
 
