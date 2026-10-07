@@ -258,6 +258,34 @@ public class GameTests
         Assert.Throws<InvalidOperationException>(game.ToStats);
     }
 
+    [Fact]
+    public void Starting_a_game_shuffles_the_players()
+    {
+        string[] names = ["Ala", "Bob", "Cyd", "Dan", "Ewa"];
+        var settings = new GameSettings(MaxScoreInHalf, Disqualified);
+
+        var orders = Enumerable.Range(0, 20)
+            .Select(seed => Names(Game.Start(names, settings, new Random(seed)).Players))
+            .ToList();
+
+        Assert.All(orders, order => Assert.Equal(names, order.Order()));
+        Assert.True(orders.Select(order => string.Join(",", order)).Distinct().Count() > 1);
+    }
+
+    [Fact]
+    public void The_starting_order_comes_from_the_given_randomness()
+    {
+        string[] names = ["Ala", "Bob", "Cyd", "Dan", "Ewa"];
+        var settings = new GameSettings(MaxScoreInHalf, Disqualified);
+
+        var first = Game.Start(names, settings, new Random(42));
+        var second = Game.Start(names, settings, new Random(42));
+
+        Assert.Equal(Names(first.Players), Names(second.Players));
+        Assert.Equal(settings, first.Settings);
+        Assert.Empty(first.Throws);
+    }
+
     [Theory]
     [InlineData]
     [InlineData("Ala")]

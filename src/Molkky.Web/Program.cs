@@ -12,6 +12,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddTransient<GameSessionStorage>();
 builder.Services.AddTransient<SettingsSessionStorage>();
 builder.Services.AddSingleton<Translator>();
+builder.Services.AddSingleton(Random.Shared);
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

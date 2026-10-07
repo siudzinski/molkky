@@ -16,5 +16,6 @@ public abstract class MudBlazorTestContext : BunitContext
         Services.AddTransient<GameSessionStorage>();
         Services.AddTransient<SettingsSessionStorage>();
         Services.AddSingleton<Translator>();
+        Services.AddSingleton(Random.Shared);
     }
 }

@@ -73,6 +73,14 @@ public sealed class Game
         RoundNumber = round;
     }
 
+    // A new game: the starting order is shuffled with the given randomness.
+    public static Game Start(IEnumerable<string> names, GameSettings settings, Random random)
+    {
+        var order = names.ToArray();
+        random.Shuffle(order);
+        return CreateNew(order, settings);
+    }
+
     // Players throw in the given order.
     public static Game CreateNew(IEnumerable<string> names, GameSettings settings) =>
         new(settings, names.Select(name => new Seat(name, ColorProvider.Instance.GetNextColor())).ToList(), []);

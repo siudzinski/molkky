@@ -43,6 +43,8 @@
     private GameSessionStorage? GameStorage { get; set; }
     [Inject]
     private SettingsSessionStorage? SettingsStorage { get; set; }
+    [Inject]
+    private Random Random { get; set; } = default!;
 
     private void AddPlayer()
     {
@@ -63,8 +65,7 @@
         if(GameStorage is not null && SettingsStorage is not null)
         {
             var (maximumPointsStrategy, missedThrowsStrategy) = await SettingsStorage.LoadSettingsState();
-            var players = playerNames.OrderBy(_ => new Random().Next());
-            var game = Game.CreateNew(players, new GameSettings(maximumPointsStrategy, missedThrowsStrategy));
+            var game = Game.Start(playerNames, new GameSettings(maximumPointsStrategy, missedThrowsStrategy), Random);
             await GameStorage.SaveGameState(game);
         }
 
