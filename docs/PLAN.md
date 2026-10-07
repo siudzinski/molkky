@@ -21,6 +21,7 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 | 2026-10-07 | Deploy with the official Pages actions (`upload-pages-artifact` + `deploy-pages`) | Built-in token, no personal access token to expire, no `gh-pages` branch. |
 | 2026-10-07 | Tests on xUnit v3 with Microsoft Testing Platform (`test.runner` in `global.json`) | xunit.v3 4.x ships MTP v2 by default, and the .NET 10 SDK runs those projects through `dotnet test` only in MTP mode. |
 | 2026-10-07 | LF line endings in the repo and every working tree (`.gitattributes` + `.editorconfig`) | CI runs on Linux; `dotnet format --verify-no-changes` must give the same answer on Windows. |
+| 2026-10-07 | The current game rules are correct; the phase 3 model rework keeps them exactly | Phase 3 is about storage and structure. The phase 2 characterisation tests define the rules and keep their expected values. |
 
 ## Known issues (found during review, 2026-10-07)
 
@@ -66,7 +67,12 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 - [x] `tools/serve-ghpages/serve.cs`: .NET 10 single-file server for the publish output (under `/molkky/`, `404.html` fallback, `/` → `/molkky/`), as `molkky-ghpages` in `.claude/launch.json`.
 - [x] Verified locally: 0 warnings, tests and format check green; game, settings and language survive a reload without `sessionStorage.js`; GHPages publish served under `/molkky/` (base href, Brotli loading, deep link via `404.html`) played to the endgame at phone width, with the chart dropping to 0 after 3 misses.
 
-## Phase 3: game model rework
+## Phase 3: game model rework (no rule changes)
+
+The game rules are correct and do not change. This phase changes how a game is stored and computed, not what it computes.
+- The phase 2 domain tests are the spec. Port them to the new API with every expected value unchanged, and remove or loosen none of them. Only the save/load test may change, because the storage format changes on purpose.
+- Rules that live outside the domain today (shuffled starting order, at least 2 players, scores 0–12) get a test before the code around them changes.
+- A test that seems to need a different expected value means the rework is wrong, not the rule.
 
 - [ ] A game becomes *settings + player order + list of throws*. Scores, misses, eliminations, round, current player, winner and chart data are all computed by replaying the throws.
   - Undo = drop the last throw.
