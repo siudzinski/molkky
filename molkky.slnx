@@ -5,5 +5,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Molkky.Domain.Tests/Molkky.Domain.Tests.csproj" />
+    <Project Path="tests/Molkky.Web.Tests/Molkky.Web.Tests.csproj" />
   </Folder>
 </Solution>
