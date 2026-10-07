@@ -56,25 +56,25 @@ public class Player
     }
 
     public void AddPoints(
-        int score, 
-        MaximumPointsStrategies maximumPointsStrategy, 
+        int score,
+        MaximumPointsStrategies maximumPointsStrategy,
         MissedThrowsStrategies missedThrowsStrategy)
     {
-        if(!CanPlay) return;
-        
-        if(score > 0)
+        if (!CanPlay) return;
+
+        if (score > 0)
         {
             _score += score;
             _numberOfFailedThrows = 0;
-            if(_score > 50)
+            if (_score > 50)
             {
                 //TODO inject strategy instead of enum
-                if(maximumPointsStrategy == MaximumPointsStrategies.MaxScoreInHalf)
+                if (maximumPointsStrategy == MaximumPointsStrategies.MaxScoreInHalf)
                 {
                     _score = 25;
                     AddToScoreHistory(25, isAbsolute: true);
                 }
-                if(maximumPointsStrategy == MaximumPointsStrategies.BackToZero) 
+                if (maximumPointsStrategy == MaximumPointsStrategies.BackToZero)
                 {
                     _score = 0;
                     AddToScoreHistory(0, isAbsolute: true);
@@ -88,14 +88,14 @@ public class Player
         else
         {
             //TODO inject strategy instead of enum
-            if(missedThrowsStrategy == MissedThrowsStrategies.Disqualified)
+            if (missedThrowsStrategy == MissedThrowsStrategies.Disqualified)
             {
                 _numberOfFailedThrows++;
             }
-            if(missedThrowsStrategy == MissedThrowsStrategies.BackToZero)
+            if (missedThrowsStrategy == MissedThrowsStrategies.BackToZero)
             {
                 _numberOfFailedThrows++;
-                if(_numberOfFailedThrows == 3)
+                if (_numberOfFailedThrows == 3)
                 {
                     _numberOfFailedThrows = 0;
                     _score = 0;
@@ -107,7 +107,7 @@ public class Player
 
     private void AddToScoreHistory(int score, bool isAbsolute = false)
     {
-        if(isAbsolute)
+        if (isAbsolute)
         {
             _scoreHistory.Add(score);
             return;

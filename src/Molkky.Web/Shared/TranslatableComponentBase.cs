@@ -5,7 +5,7 @@ namespace Molkky.Web.Shared;
 
 public class TranslatableComponentBase : ComponentBase, IDisposable
 {
-    [Inject] 
+    [Inject]
     public required Translator Translator { get; set; }
 
     protected override void OnInitialized()

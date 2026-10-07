@@ -32,7 +32,7 @@ public class Game
         IEnumerable<Player> players,
         MaximumPointsStrategies maximumPointsStrategy,
         MissedThrowsStrategies missedThrowsStrategy,
-        int numberOfThrowsInRound, 
+        int numberOfThrowsInRound,
         int roundNumber) : this(players, maximumPointsStrategy, missedThrowsStrategy)
     {
         _numberOfThrowsInRound = numberOfThrowsInRound;
@@ -40,8 +40,8 @@ public class Game
     }
 
     public static Game CreateNew(
-        IEnumerable<Player> players, 
-        MaximumPointsStrategies maximumPointsStrategy, 
+        IEnumerable<Player> players,
+        MaximumPointsStrategies maximumPointsStrategy,
         MissedThrowsStrategies missedThrowsStrategy)
     {
         return new Game(players, maximumPointsStrategy, missedThrowsStrategy);
@@ -51,7 +51,7 @@ public class Game
     {
         _roundNumber = 1;
         _numberOfThrowsInRound = 0;
-        foreach(var player in _players)
+        foreach (var player in _players)
         {
             player.Reset();
         }
@@ -60,7 +60,7 @@ public class Game
     public static Game FromGameState(GameState gameState)
     {
         return new Game(
-            gameState.Players.Select(Player.FromPlayerState), 
+            gameState.Players.Select(Player.FromPlayerState),
             gameState.MaximumPointsStrategy,
             gameState.MissedThrowsStrategy,
             gameState.NumberOfThrowsInRound,
@@ -87,20 +87,20 @@ public class Game
 
     public void SetThrowScoreForCurrentPlayer(int score)
     {
-        if(Winner is not null) return;
-        
+        if (Winner is not null) return;
+
         CurrentPlayer.AddPoints(score, _maximumPointsStrategy, _missedThrowsStrategy);
         EvaluatePlayers();
     }
 
     private void EvaluatePlayers()
     {
-        if(CurrentPlayer.CanPlay)
+        if (CurrentPlayer.CanPlay)
         {
             _numberOfThrowsInRound++;
         }
 
-        if(_numberOfThrowsInRound ==  _players.Where(_ => _.CanPlay).Count())
+        if (_numberOfThrowsInRound == _players.Where(_ => _.CanPlay).Count())
         {
             _numberOfThrowsInRound = 0;
             _players = _players.OrderBy(_ => _.Score).ToList();

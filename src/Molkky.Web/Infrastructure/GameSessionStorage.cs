@@ -27,7 +27,7 @@ public class GameSessionStorage
                 PropertyNameCaseInsensitive = true
             });
 
-            if(gameState is null) return null;
+            if (gameState is null) return null;
 
             return Game.FromGameState(gameState);
         }
@@ -37,7 +37,7 @@ public class GameSessionStorage
 
     public async Task SaveGameState(Game? game)
     {
-        if(game is not null)
+        if (game is not null)
         {
             var jsonString = JsonSerializer.Serialize(game.ToGameState());
             await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", StorageKey, jsonString);

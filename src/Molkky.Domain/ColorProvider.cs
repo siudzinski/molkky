@@ -3,13 +3,13 @@ namespace Molkky.Domain;
 public class ColorProvider
 {
     private static readonly List<string> _availableColors = new()
-    { 
+    {
         "primary", "secondary", "info", "success", "warning"
     };
 
     private int _currentIndex = 0;
 
-    private ColorProvider() {}
+    private ColorProvider() { }
 
     public static readonly ColorProvider Instance = new();
 

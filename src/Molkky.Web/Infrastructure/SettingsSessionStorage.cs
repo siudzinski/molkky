@@ -29,7 +29,7 @@ public class SettingsSessionStorage
                 PropertyNameCaseInsensitive = true
             });
 
-            if(settingsState is not null)
+            if (settingsState is not null)
             {
                 return settingsState;
             }

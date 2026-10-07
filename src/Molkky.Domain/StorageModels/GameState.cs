@@ -1,8 +1,8 @@
 namespace Molkky.Domain.StorageModels;
 
 public record GameState(
-    IEnumerable<PlayerState> Players, 
+    IEnumerable<PlayerState> Players,
     MaximumPointsStrategies MaximumPointsStrategy,
     MissedThrowsStrategies MissedThrowsStrategy,
-    int NumberOfThrowsInRound, 
+    int NumberOfThrowsInRound,
     int RoundNumber);
