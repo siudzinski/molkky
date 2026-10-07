@@ -22,6 +22,24 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore
+        run: dotnet restore molkky.slnx
+
+      # Warnings are errors (Directory.Build.props)
+      - name: Build
+        run: dotnet build molkky.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test --solution molkky.slnx -c Release --no-build
+
+      - name: Format
+        run: dotnet format molkky.slnx --verify-no-changes --no-restore
+
       # Same publish as the deploy workflow, so a broken GitHub Pages build fails the PR
       - name: Publish
         run: dotnet publish src/Molkky.Web/Molkky.Web.csproj -c Release -o publish -p:GHPages=true
+
+      - name: Check GitHub Pages output
+        run: |
+          grep -q '<base href="/molkky/" />' publish/wwwroot/index.html
+          test -f publish/wwwroot/404.html
