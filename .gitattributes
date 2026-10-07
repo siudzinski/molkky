@@ -1,0 +1,6 @@
+# LF in the repo and in every working tree (Windows included), so `dotnet format --verify-no-changes`
+# gives the same answer locally as on the Linux CI runner. Must agree with end_of_line in .editorconfig.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary

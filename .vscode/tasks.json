@@ -1,0 +1,55 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "molkky.slnx"],
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "test",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test"],
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "format",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["format", "molkky.slnx"],
+      "problemMatcher": []
+    },
+    {
+      "label": "watch",
+      "detail": "Dev server with hot reload on http://localhost:5295",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["watch", "--project", "src/Molkky.Web/Molkky.Web.csproj", "--launch-profile", "http"],
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish (GitHub Pages)",
+      "detail": "Same publish as CI and deploy, into ./publish",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["publish", "src/Molkky.Web/Molkky.Web.csproj", "-c", "Release", "-o", "publish", "-p:GHPages=true"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "serve (GitHub Pages)",
+      "detail": "Publish, then serve it like GitHub Pages on http://localhost:5300/molkky/",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run", "--file", "tools/serve-ghpages/serve.cs"],
+      "dependsOn": "publish (GitHub Pages)",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

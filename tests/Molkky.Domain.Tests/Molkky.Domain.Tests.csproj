@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Molkky.Domain\Molkky.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
