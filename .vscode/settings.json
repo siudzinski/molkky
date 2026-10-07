@@ -1,0 +1,6 @@
+{
+  "dotnet.defaultSolution": "molkky.slnx",
+  // Tests run on Microsoft Testing Platform (see global.json).
+  "dotnet.testWindow.useTestingPlatformProtocol": true,
+  "files.eol": "\n"
+}
