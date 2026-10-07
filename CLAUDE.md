@@ -8,6 +8,7 @@ Blazor WebAssembly (.NET 10) app for keeping score in Mölkky, served as a stati
 - `src/Molkky.Web`: the Blazor app. `Pages/`, `Shared/`, and `Infrastructure/` for sessionStorage (JS interop) and translations.
 - `tests/Molkky.Domain.Tests`: xUnit v3 tests of the rules.
 - `tests/Molkky.Web.Tests`: bUnit component tests. Derive from `MudBlazorTestContext`, which registers MudBlazor and the `Translator`.
+- `tools/serve-ghpages/serve.cs`: single-file static server that serves the publish output like GitHub Pages.
 
 ## Commands (from the repo root)
 
@@ -16,6 +17,7 @@ Blazor WebAssembly (.NET 10) app for keeping score in Mölkky, served as a stati
 - Format: `dotnet format` (CI runs `dotnet format --verify-no-changes`)
 - Run: `dotnet run --project src/Molkky.Web --launch-profile http` → http://localhost:5295 (`molkky-dev` in `.claude/launch.json`)
 - Publish for GitHub Pages: `dotnet publish src/Molkky.Web -c Release -o publish -p:GHPages=true`
+- Serve that publish like GitHub Pages: `dotnet run --file tools/serve-ghpages/serve.cs` → http://localhost:5300/molkky/ (`molkky-ghpages` in `.claude/launch.json`; publish again after changes)
 
 ## Rules
 
@@ -31,7 +33,8 @@ Blazor WebAssembly (.NET 10) app for keeping score in Mölkky, served as a stati
 
 - Tests run on Microsoft Testing Platform (`global.json`), not VSTest. Filter one project at a time, e.g. `dotnet test --project tests/Molkky.Domain.Tests --filter-class "*GameTests"`; a filter across the solution fails on the project where nothing matches.
 - Line endings are LF everywhere (`.gitattributes`, `.editorconfig`) because CI runs on Linux.
-- The GitHub Pages publish takes `<base href="/molkky/">` from the git `origin` remote and copies `index.html` to `404.html` for deep links. After touching `index.html`, routing or the publish, check that `publish/wwwroot/index.html` still has that base href and that `404.html` exists.
+- The GitHub Pages publish takes `<base href="/molkky/">` from the git `origin` remote and copies `index.html` to `404.html` for deep links. After touching `index.html`, routing or the publish, check that `publish/wwwroot/index.html` still has that base href and that `404.html` exists, then play it through `molkky-ghpages`.
+- `serve.cs` runs with `dotnet run --file` (plain `dotnet run` picks up a project in the working directory) and stays alone in its folder (the Web SDK compiles any `.razor` files next to it).
 
 ## Done means
 

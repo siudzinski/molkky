@@ -40,6 +40,16 @@
       "command": "dotnet",
       "args": ["publish", "src/Molkky.Web/Molkky.Web.csproj", "-c", "Release", "-o", "publish", "-p:GHPages=true"],
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "serve (GitHub Pages)",
+      "detail": "Publish, then serve it like GitHub Pages on http://localhost:5300/molkky/",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run", "--file", "tools/serve-ghpages/serve.cs"],
+      "dependsOn": "publish (GitHub Pages)",
+      "isBackground": true,
+      "problemMatcher": []
     }
   ]
 }

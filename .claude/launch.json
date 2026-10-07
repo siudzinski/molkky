@@ -6,6 +6,12 @@
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "src/Molkky.Web/Molkky.Web.csproj", "--launch-profile", "http"],
       "port": 5295
+    },
+    {
+      "name": "molkky-ghpages",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--file", "tools/serve-ghpages/serve.cs"],
+      "port": 5300
     }
   ]
 }
