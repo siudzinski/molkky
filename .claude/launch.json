@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "molkky-dev",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "molkky.csproj", "--launch-profile", "http"],
+      "port": 5295
+    }
+  ]
+}
