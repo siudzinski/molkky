@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using molkky.Infrastructure;
+using Molkky.Web.Infrastructure;
 
-namespace molkky.Shared;
+namespace Molkky.Web.Shared;
 
 public class TranslatableComponentBase : ComponentBase, IDisposable
 {

@@ -1,4 +1,4 @@
-namespace molkky.Domain;
+namespace Molkky.Domain;
 
 public enum MissedThrowsStrategies
 {

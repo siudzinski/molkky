@@ -4,7 +4,7 @@
     {
       "name": "molkky-dev",
       "runtimeExecutable": "dotnet",
-      "runtimeArgs": ["run", "--project", "molkky.csproj", "--launch-profile", "http"],
+      "runtimeArgs": ["run", "--project", "src/Molkky.Web/Molkky.Web.csproj", "--launch-profile", "http"],
       "port": 5295
     }
   ]

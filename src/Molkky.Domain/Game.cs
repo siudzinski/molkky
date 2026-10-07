@@ -1,6 +1,6 @@
-using molkky.Domain.StorageModels;
+using Molkky.Domain.StorageModels;
 
-namespace molkky.Domain;
+namespace Molkky.Domain;
 
 public class Game
 {

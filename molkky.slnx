@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="molkky.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/Molkky.Domain/Molkky.Domain.csproj" />
+    <Project Path="src/Molkky.Web/Molkky.Web.csproj" />
+  </Folder>
 </Solution>

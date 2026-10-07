@@ -1,4 +1,4 @@
-namespace molkky.Domain.StorageModels;
+namespace Molkky.Domain.StorageModels;
 
 public record SettingsState(
     MaximumPointsStrategies MaximumPointsStrategy,

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Microsoft.JSInterop;
-using molkky.Domain;
-using molkky.Domain.StorageModels;
+using Molkky.Domain;
+using Molkky.Domain.StorageModels;
 
-namespace molkky.Infrastructure;
+namespace Molkky.Web.Infrastructure;
 
 public class SettingsSessionStorage
 {

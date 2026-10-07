@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using molkky;
-using molkky.Infrastructure;
+using Molkky.Web;
+using Molkky.Web.Infrastructure;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

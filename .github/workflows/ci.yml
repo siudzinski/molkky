@@ -24,4 +24,4 @@ jobs:
 
       # Same publish as the deploy workflow, so a broken GitHub Pages build fails the PR
       - name: Publish
-        run: dotnet publish molkky.csproj -c Release -o publish -p:GHPages=true
+        run: dotnet publish src/Molkky.Web/Molkky.Web.csproj -c Release -o publish -p:GHPages=true

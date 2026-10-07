@@ -1,6 +1,6 @@
 using Microsoft.JSInterop;
 
-namespace molkky.Infrastructure;
+namespace Molkky.Web.Infrastructure;
 
 public class Translator
 {

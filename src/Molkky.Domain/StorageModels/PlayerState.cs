@@ -1,4 +1,4 @@
-namespace molkky.Domain.StorageModels;
+namespace Molkky.Domain.StorageModels;
 
 public record PlayerState(string Name, int Score, int NumberOfFailedThrows, int[] ScoreHistory, string AvatarColor);
 

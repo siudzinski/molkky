@@ -28,7 +28,7 @@ jobs:
 
       # GHPages=true rewrites <base href> to /molkky/ and adds 404.html for deep links
       - name: Publish
-        run: dotnet publish molkky.csproj -c Release -o publish -p:GHPages=true
+        run: dotnet publish src/Molkky.Web/Molkky.Web.csproj -c Release -o publish -p:GHPages=true
 
       - name: Configure Pages
         uses: actions/configure-pages@v6

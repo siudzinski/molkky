@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor" />
+    <PackageReference Include="PublishSPAforGitHubPages.Build" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Molkky.Domain\Molkky.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

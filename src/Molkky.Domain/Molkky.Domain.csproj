@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Game rules only: no Blazor, JS interop or UI library references. -->
+
+</Project>

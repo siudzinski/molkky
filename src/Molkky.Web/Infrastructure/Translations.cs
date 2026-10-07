@@ -1,4 +1,4 @@
-namespace molkky.Infrastructure;
+namespace Molkky.Web.Infrastructure;
 
 public static class Translations
 {
