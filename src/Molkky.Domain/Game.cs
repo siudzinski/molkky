@@ -6,7 +6,7 @@ namespace Molkky.Domain;
 // A game is its settings, the players in their starting order and the throws so far. Everything
 // else (scores, misses, eliminations, round, current player, winner, chart data) is computed by
 // replaying the throws, so a game never holds state that could disagree with its throws.
-// Immutable: a throw, an undo or a new round returns a new Game.
+// Immutable: a throw, an undo or playing again returns a new Game.
 public sealed class Game
 {
     public const int PointsToWin = 50;

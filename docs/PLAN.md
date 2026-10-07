@@ -22,13 +22,16 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 | 2026-10-07 | Tests on xUnit v3 with Microsoft Testing Platform (`test.runner` in `global.json`) | xunit.v3 4.x ships MTP v2 by default, and the .NET 10 SDK runs those projects through `dotnet test` only in MTP mode. |
 | 2026-10-07 | LF line endings in the repo and every working tree (`.gitattributes` + `.editorconfig`) | CI runs on Linux; `dotnet format --verify-no-changes` must give the same answer on Windows. |
 | 2026-10-07 | The current game rules are correct; the phase 3 model rework keeps them exactly | Phase 3 is about storage and structure. The phase 2 characterisation tests define the rules and keep their expected values. |
+| 2026-10-07 | `Game` is immutable: a throw, an undo or play again returns a new game, computed by replaying the throws | Nothing computed can drift from the throws; undo is dropping the last throw. Replaying a few hundred throws per change is instant. |
+| 2026-10-07 | Stored data is versioned JSON under `molkky.*` keys; unreadable or unknown-version data is a fresh start, never an error | Every project on `siudzinski.github.io` shares one localStorage. A later format adds a version that still loads v1; a newer document is left alone, not overwritten on read. |
+| 2026-10-07 | A player's colour is their seat in the starting order of their first game; the UI maps it onto its palette | The domain holds no UI names, and colours stay with players through re-sorts and play again. |
 
 ## Known issues (found during review, 2026-10-07)
 
 - **Fixed in phase 2.** **Bug:** with the "3 misses → back to zero" setting, `Player.AddPoints` set the score to 0 but appended the *previous* total to the score history, so the endgame chart was wrong from that throw onwards. The history now records the score after every throw.
 - **Fixed in phase 2.** `wwwroot/js/sessionStorage.js` was a no-op (`window.sessionStorage` cannot be reassigned); if it ever took effect, `getItem` would recurse forever. Deleted.
-- The domain stores MudBlazor colour names (`ColorProvider`) that the UI parses back with `Enum.Parse(typeof(Color), …)`. Store a palette index instead (phase 3).
-- `Gameplay` and `Settings` save state in `OnAfterRenderAsync`, i.e. on every render. Save on change instead (phase 3).
+- **Fixed in phase 3.** The domain stored MudBlazor colour names (`ColorProvider`) that the UI parsed back with `Enum.Parse(typeof(Color), …)`. It now stores a palette index that `PlayerColors` maps to the same five colours.
+- **Fixed in phase 3.** `Gameplay` and `Settings` saved state in `OnAfterRenderAsync`, i.e. on every render. They now save on change: after each throw (the winning one before going to the endgame), on each settings change and on each language toggle.
 - `index.html` sets `user-scalable=no`, which blocks zoom (accessibility). Remove in phase 4.
 
 ## Phase 1: .NET 10 and deploy pipeline (no behaviour change)
@@ -74,17 +77,23 @@ The game rules are correct and do not change. This phase changes how a game is s
 - Rules that live outside the domain today (shuffled starting order, at least 2 players, scores 0–12) get a test before the code around them changes.
 - A test that seems to need a different expected value means the rework is wrong, not the rule.
 
-- [ ] A game becomes *settings + player order + list of throws*. Scores, misses, eliminations, round, current player, winner and chart data are all computed by replaying the throws.
-  - Undo = drop the last throw.
+- [x] Pinned first: bUnit tests for the 2-player minimum, the shuffled starting order and the default settings in `NewGame.razor` (scores 0–12 were already pinned by `KeyboardTests`).
+- [x] A game becomes *settings + player order + list of throws*. Scores, misses, eliminations, round, current player, winner and chart data are all computed by replaying the throws.
+  - Undo = drop the last throw (`Game.Undo`, tested; the button comes with the phase 4 score pad).
   - The score-history bug class goes away.
   - Stats come for free.
-- [ ] Rule variants as small strategy classes (replaces the two `TODO inject strategy` comments in `Player.cs`). The re-sort house rule is a named, tested rule.
-- [ ] Persistence:
+  - The shuffle and the 2-player minimum moved into the domain (`Game.Start` with an injected `Random`); a throw is checked to be 0–12.
+  - Every phase 2 test ported with its expected values unchanged; outside the repo, 20,000 random games against the phase 2 code gave identical state after every throw.
+- [x] Rule variants as small strategy classes (replaces the two `TODO inject strategy` comments in `Player.cs`). The re-sort house rule is a named, tested rule (`Rules/LowestScoreThrowsFirst`).
+- [x] Persistence:
   - `localStorage` with a versioned schema (`{ "version": 1, ... }`) so later changes can migrate old data;
   - "Resume game?" on start;
   - save after each throw, not on every render.
-- [ ] Typed translations: one object per language with `required` properties, so a missing string fails the build.
-- [ ] Player colours stored as a palette index, not UI-library names.
+  - Old or unreadable data (bad JSON, another version, a game the rules reject) is a fresh start; no migration from `sessionStorage`.
+- [x] Typed translations: one object per language with `required` properties, so a missing string fails the build.
+- [x] Player colours stored as a palette index, not UI-library names.
+- [x] Verified locally: 0 warnings, tests and format check green; GHPages publish served by `molkky-ghpages` at 375 px: full games to the endgame with "max score in half" + "disqualified" and with both "back to zero"; "Resume game?" after a reload mid-game and in a new tab, resuming the exact state; settings and language kept; old or unreadable data starts fresh.
+- [ ] Merge, confirm the deploy run succeeds and the live site works.
 
 ## Phase 4: UI rebuild (Tailwind)
 
