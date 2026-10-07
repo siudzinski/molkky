@@ -83,9 +83,9 @@ public sealed class Game
         return CreateNew(order, settings);
     }
 
-    // Players throw in the given order.
+    // Players throw in the given order, and get their colour by seat.
     public static Game CreateNew(IEnumerable<string> names, GameSettings settings) =>
-        new(settings, names.Select(name => new Seat(name, ColorProvider.Instance.GetNextColor())).ToList(), []);
+        new(settings, names.Select((name, seat) => new Seat(name, seat)).ToList(), []);
 
     // The current player's throw: 0 is a miss, 1-12 a hit. Throws after the game is won are ignored.
     public Game Throw(int points)
@@ -105,12 +105,12 @@ public sealed class Game
     public static Game FromGameState(GameState gameState) =>
         new(
             new GameSettings(gameState.MaximumPointsStrategy, gameState.MissedThrowsStrategy),
-            gameState.Players.Select(player => new Seat(player.Name, player.AvatarColor)).ToList(),
+            gameState.Players.Select(player => new Seat(player.Name, player.ColorIndex)).ToList(),
             [.. gameState.Throws]);
 
     public GameState ToGameState() =>
         new(
-            _seats.Select(seat => new PlayerState(seat.Name, seat.AvatarColor)),
+            _seats.Select(seat => new PlayerState(seat.Name, seat.ColorIndex)),
             Settings.MaximumPoints,
             Settings.MissedThrows,
             [.. _throws]);

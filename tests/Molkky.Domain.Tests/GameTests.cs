@@ -235,7 +235,7 @@ public class GameTests
             Assert.Equal(before.Score, after.Score);
             Assert.Equal(before.NumberOfFailedThrows, after.NumberOfFailedThrows);
             Assert.Equal(before.ScoreHistory, after.ScoreHistory);
-            Assert.Equal(before.AvatarColor, after.AvatarColor);
+            Assert.Equal(before.ColorIndex, after.ColorIndex);
         }
     }
 
@@ -284,6 +284,23 @@ public class GameTests
         Assert.Equal(Names(first.Players), Names(second.Players));
         Assert.Equal(settings, first.Settings);
         Assert.Empty(first.Throws);
+    }
+
+    [Fact]
+    public void Players_get_a_colour_by_seat_in_the_starting_order()
+    {
+        var game = NewGame("Ala", "Bob", "Cyd", "Dan", "Ewa", "Fra");
+
+        Assert.Equal([0, 1, 2, 3, 4, 5], game.Players.Select(p => p.ColorIndex));
+    }
+
+    [Fact]
+    public void Players_keep_their_colour_when_the_order_changes_and_on_play_again()
+    {
+        var game = Play(NewGame("Ala", "Bob", "Cyd"), ("Ala", 10), ("Bob", 2), ("Cyd", 5));
+
+        Assert.Equal([("Bob", 1), ("Cyd", 2), ("Ala", 0)], game.Players.Select(p => (p.Name, p.ColorIndex)));
+        Assert.Equal([("Bob", 1), ("Cyd", 2), ("Ala", 0)], game.PlayAgain().Players.Select(p => (p.Name, p.ColorIndex)));
     }
 
     [Theory]

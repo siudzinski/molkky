@@ -24,7 +24,7 @@
                 {
                     <MudGrid>
                         <MudItem xs="4">
-                            <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), game.CurrentPlayer.AvatarColor, true))">@game.CurrentPlayer.FirstLetter</MudAvatar>
+                            <MudAvatar Size="Size.Large" Color="@PlayerColors.For(game.CurrentPlayer.ColorIndex)">@game.CurrentPlayer.FirstLetter</MudAvatar>
                         </MudItem>
                         <MudItem xs="8">
                             <MudGrid>
@@ -58,7 +58,7 @@
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="4">
-                                    <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), player.AvatarColor, true))">@player.FirstLetter</MudAvatar>
+                                    <MudAvatar Size="Size.Large" Color="@PlayerColors.For(player.ColorIndex)">@player.FirstLetter</MudAvatar>
                                 </MudItem>
                                 <MudItem xs="8">
                                     <MudGrid>
@@ -89,7 +89,7 @@
                 {
                     <MudItem xs="12" sm="6" md="4">
                     <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
-                        <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), loser.AvatarColor, true))">@loser.FirstLetter</MudAvatar>
+                        <MudAvatar Size="Size.Large" Color="@PlayerColors.For(loser.ColorIndex)">@loser.FirstLetter</MudAvatar>
                         @loser.Name
                     </MudChip>
                 </MudItem>

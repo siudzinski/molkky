@@ -14,7 +14,8 @@ public sealed class Player
 
     public string Name => Seat.Name;
     public string FirstLetter => Name[..1].ToUpper();
-    public string AvatarColor => Seat.AvatarColor;
+    // Index into the UI's colour palette, which repeats when there are more players than colours.
+    public int ColorIndex => Seat.ColorIndex;
     public int Score { get; }
     // The score after each of this player's throws.
     public IReadOnlyList<int> ScoreHistory => _scoreHistory;
@@ -32,7 +33,7 @@ public sealed class Player
 
     internal static Player AtStart(Seat seat) => new(seat, 0, 0, []);
 
-    public static Player CreateNew(string name) => AtStart(new Seat(name, ColorProvider.Instance.GetNextColor()));
+    public static Player CreateNew(string name) => AtStart(new Seat(name, 0));
 
     // The player after one more throw: a hit (1-12) adds its points and clears the misses, a miss (0)
     // counts as a failed throw. An eliminated player ignores throws.
