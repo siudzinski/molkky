@@ -1,5 +1,4 @@
 @using Molkky.Domain
-@using Molkky.Domain.StorageModels
 @using Molkky.Web.Infrastructure
 @inherits TranslatableComponentBase
 
@@ -17,7 +16,7 @@
             <MudText>@Text.MaxScoreSettingDescription</MudText>
         </MudItem>
         <MudItem xs="12">
-            <MudRadioGroup @bind-Value="@MaximumPointsStrategy">
+            <MudRadioGroup @bind-Value="@MaximumPointsStrategy" @bind-Value:after="Save">
                 <MudRadio Value="@MaximumPointsStrategies.MaxScoreInHalf.ToString()" Color="Color.Primary">@Text.MaxScoreInHalfOption</MudRadio>
                 <MudRadio Value="@MaximumPointsStrategies.BackToZero.ToString()" Color="Color.Primary">@Text.MaxScoreBackToZeroOption</MudRadio>
             </MudRadioGroup>
@@ -27,7 +26,7 @@
             <MudText>@Text.MissedThrowsSettingDescription</MudText>
         </MudItem>
         <MudItem xs="12">
-            <MudRadioGroup @bind-Value="@MissedThrowsStrategy">
+            <MudRadioGroup @bind-Value="@MissedThrowsStrategy" @bind-Value:after="Save">
                 <MudRadio Value="@MissedThrowsStrategies.Disqualified.ToString()" Color="Color.Primary">@Text.MissedThrowsDisqualifiedOption</MudRadio>
                 <MudRadio Value="@MissedThrowsStrategies.BackToZero.ToString()" Color="Color.Primary">@Text.MissedThrowsBackToZeroOption</MudRadio>
             </MudRadioGroup>
@@ -39,29 +38,21 @@
 @code {
 
     [Inject]
-    private SettingsSessionStorage? SettingsStorage { get; set; }
+    private SettingsStore SettingsStore { get; set; } = default!;
 
-    public string MaximumPointsStrategy { get; set; } = MaximumPointsStrategies.MaxScoreInHalf.ToString();
-    public string MissedThrowsStrategy { get; set; } = MissedThrowsStrategies.Disqualified.ToString();
+    public string MaximumPointsStrategy { get; set; } = GameSettings.Default.MaximumPoints.ToString();
+    public string MissedThrowsStrategy { get; set; } = GameSettings.Default.MissedThrows.ToString();
 
     protected override async Task OnInitializedAsync()
     {
-        if(SettingsStorage is not null)
-        {
-            var settings = await SettingsStorage.LoadSettingsState();
-            MaximumPointsStrategy = settings.MaximumPointsStrategy.ToString();
-            MissedThrowsStrategy = settings.MissedThrowsStrategy.ToString();
-        }
+        var settings = await SettingsStore.Load();
+        MaximumPointsStrategy = settings.MaximumPoints.ToString();
+        MissedThrowsStrategy = settings.MissedThrows.ToString();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(SettingsStorage is not null)
-        {
-            var maximumPointsStrategy = Enum.Parse<MaximumPointsStrategies>(MaximumPointsStrategy);
-            var missedThrowsStrategy = Enum.Parse<MissedThrowsStrategies>(MissedThrowsStrategy);
-
-            await SettingsStorage.SaveSettingsState(new SettingsState(maximumPointsStrategy, missedThrowsStrategy));
-        }
-    }
+    // Saved on each change; a new game starts with the saved settings.
+    private Task Save() =>
+        SettingsStore.Save(new GameSettings(
+            Enum.Parse<MaximumPointsStrategies>(MaximumPointsStrategy),
+            Enum.Parse<MissedThrowsStrategies>(MissedThrowsStrategy)));
 }

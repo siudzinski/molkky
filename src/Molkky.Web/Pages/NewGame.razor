@@ -40,9 +40,9 @@
     private bool StartGameDisabled => playerNames.Count < 2;
 
     [Inject]
-    private GameSessionStorage? GameStorage { get; set; }
+    private GameStore GameStore { get; set; } = default!;
     [Inject]
-    private SettingsSessionStorage? SettingsStorage { get; set; }
+    private SettingsStore SettingsStore { get; set; } = default!;
     [Inject]
     private Random Random { get; set; } = default!;
 
@@ -62,12 +62,8 @@
 
     private async Task StartGame()
     {
-        if(GameStorage is not null && SettingsStorage is not null)
-        {
-            var (maximumPointsStrategy, missedThrowsStrategy) = await SettingsStorage.LoadSettingsState();
-            var game = Game.Start(playerNames, new GameSettings(maximumPointsStrategy, missedThrowsStrategy), Random);
-            await GameStorage.SaveGameState(game);
-        }
+        var game = Game.Start(playerNames, await SettingsStore.Load(), Random);
+        await GameStore.Save(game);
 
         playerNames.Clear();
         playerName = string.Empty;

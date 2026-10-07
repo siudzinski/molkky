@@ -31,7 +31,7 @@
 
 @code {
     [Inject]
-    private GameSessionStorage? GameStorage { get; set; }
+    private GameStore GameStore { get; set; } = default!;
 
     private Game? game;
     
@@ -44,13 +44,16 @@
     {
         await base.OnInitializedAsync();
 
-        if(GameStorage is null) return;
-        
-        game = await GameStorage.LoadGameState();
-        var stats = game?.ToStats();
+        game = await GameStore.Load();
+        if (game is not { AnyWinner: true })
+        {
+            // Nothing finished to show (e.g. this address opened in a new tab): start a new game.
+            NavigationManager.NavigateTo("");
+            return;
+        }
 
-        if (stats is null) return;
-        
+        var stats = game.ToStats();
+
         var players = new List<ChartSeries>();
         foreach (var player in stats.Players)
         {
@@ -73,9 +76,9 @@
 
     private async Task PlayAgain()
     {
-        if(game is not null && GameStorage is not null)
+        if (game is not null)
         {
-            await GameStorage.SaveGameState(game.PlayAgain());
+            await GameStore.Save(game.PlayAgain());
             NavigationManager.NavigateTo("gameplay");
         }
     }

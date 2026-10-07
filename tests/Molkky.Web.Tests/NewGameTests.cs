@@ -1,10 +1,8 @@
-using System.Text.Json;
 using AngleSharp.Dom;
 using Bunit;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.DependencyInjection;
 using Molkky.Domain;
-using Molkky.Domain.StorageModels;
+using Molkky.Domain.Storage;
+using Molkky.Web.Infrastructure;
 using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
@@ -24,13 +22,9 @@ public class NewGameTests : MudBlazorTestContext
     }
 
     // The game the page saved when it was started.
-    private GameState StartedGame()
-    {
-        var saved = JSInterop.Invocations["sessionStorage.setItem"].Last(call => (string?)call.Arguments[0] == "game");
-        return JsonSerializer.Deserialize<GameState>((string)saved.Arguments[1]!)!;
-    }
+    private Game StartedGame() => SavedGame()!;
 
-    private static string[] Names(GameState game) => game.Players.Select(p => p.Name).ToArray();
+    private static string[] Names(Game game) => game.Players.Select(p => p.Name).ToArray();
 
     [Fact]
     public void A_game_needs_at_least_two_players()
@@ -54,7 +48,7 @@ public class NewGameTests : MudBlazorTestContext
 
         Button(page, "Start game").Click();
 
-        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Services.GetRequiredService<NavigationManager>().Uri));
+        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
         Assert.Equal(new[] { "Ala", "Bob", "Cyd" }, Names(StartedGame()).Order());
     }
 
@@ -70,7 +64,7 @@ public class NewGameTests : MudBlazorTestContext
         {
             AddPlayers(page, names);
             Button(page, "Start game").Click();
-            page.WaitForAssertion(() => Assert.Equal(i + 1, JSInterop.Invocations["sessionStorage.setItem"].Count(call => (string?)call.Arguments[0] == "game")));
+            page.WaitForAssertion(() => Assert.Equal(i + 1, Storage.Writes.Count(key => key == GameStore.Key)));
 
             var order = Names(StartedGame());
             Assert.Equal(names.Order(), order.Order());
@@ -88,23 +82,23 @@ public class NewGameTests : MudBlazorTestContext
 
         Button(page, "Start game").Click();
 
-        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Services.GetRequiredService<NavigationManager>().Uri));
-        Assert.Equal(MaximumPointsStrategies.MaxScoreInHalf, StartedGame().MaximumPointsStrategy);
-        Assert.Equal(MissedThrowsStrategies.Disqualified, StartedGame().MissedThrowsStrategy);
+        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
+        Assert.Equal(MaximumPointsStrategies.MaxScoreInHalf, StartedGame().Settings.MaximumPoints);
+        Assert.Equal(MissedThrowsStrategies.Disqualified, StartedGame().Settings.MissedThrows);
     }
 
     [Fact]
     public void A_new_game_has_the_saved_settings()
     {
-        var settings = new SettingsState(MaximumPointsStrategies.BackToZero, MissedThrowsStrategies.BackToZero);
-        JSInterop.Setup<string>("sessionStorage.getItem", "settings").SetResult(JsonSerializer.Serialize(settings));
+        var settings = new GameSettings(MaximumPointsStrategies.BackToZero, MissedThrowsStrategies.BackToZero);
+        Storage.Items[SettingsStore.Key] = StorageFormat.SaveSettings(settings);
         var page = Render<NewGame>();
         AddPlayers(page, "Ala", "Bob");
 
         Button(page, "Start game").Click();
 
-        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Services.GetRequiredService<NavigationManager>().Uri));
-        Assert.Equal(MaximumPointsStrategies.BackToZero, StartedGame().MaximumPointsStrategy);
-        Assert.Equal(MissedThrowsStrategies.BackToZero, StartedGame().MissedThrowsStrategy);
+        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
+        Assert.Equal(MaximumPointsStrategies.BackToZero, StartedGame().Settings.MaximumPoints);
+        Assert.Equal(MissedThrowsStrategies.BackToZero, StartedGame().Settings.MissedThrows);
     }
 }

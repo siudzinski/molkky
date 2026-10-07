@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using Molkky.Domain.Rules;
-using Molkky.Domain.StorageModels;
 
 namespace Molkky.Domain;
 
@@ -18,6 +17,8 @@ public sealed class Game
 
     public GameSettings Settings { get; }
     public IReadOnlyList<int> Throws => _throws;
+    // The players in their starting order.
+    internal IReadOnlyList<Seat> Seats => _seats;
 
     // Everyone, eliminated players included, in the current order.
     public IReadOnlyList<Player> AllPlayers { get; }
@@ -28,6 +29,7 @@ public sealed class Game
     public Player? Winner { get; }
     public bool AnyWinner => Winner is not null;
     public int RoundNumber { get; }
+    public bool CanUndo => !_throws.IsEmpty;
 
     private Game(GameSettings settings, IReadOnlyList<Seat> seats, ImmutableList<int> throws)
     {
@@ -94,26 +96,15 @@ public sealed class Game
         return AnyWinner ? this : new Game(Settings, _seats, _throws.Add(points));
     }
 
-    public bool CanUndo => !_throws.IsEmpty;
-
     // Drops the last throw; the replay puts back everything it changed.
     public Game Undo() => CanUndo ? new Game(Settings, _seats, _throws.RemoveAt(_throws.Count - 1)) : this;
 
     // Same players and settings, starting in the order they finished in; eliminated players come back.
     public Game PlayAgain() => new(Settings, AllPlayers.Select(player => player.Seat).ToList(), []);
 
-    public static Game FromGameState(GameState gameState) =>
-        new(
-            new GameSettings(gameState.MaximumPointsStrategy, gameState.MissedThrowsStrategy),
-            gameState.Players.Select(player => new Seat(player.Name, player.ColorIndex)).ToList(),
-            [.. gameState.Throws]);
-
-    public GameState ToGameState() =>
-        new(
-            _seats.Select(seat => new PlayerState(seat.Name, seat.ColorIndex)),
-            Settings.MaximumPoints,
-            Settings.MissedThrows,
-            [.. _throws]);
+    // A stored game. Throws ArgumentException when the players or throws break the rules.
+    internal static Game Restore(GameSettings settings, IReadOnlyList<Seat> seats, IEnumerable<int> throws) =>
+        new(settings, seats, [.. throws]);
 
     public Stats ToStats()
     {

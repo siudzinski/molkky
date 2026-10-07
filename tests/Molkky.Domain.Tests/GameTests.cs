@@ -1,5 +1,4 @@
-using System.Text.Json;
-using Molkky.Domain.StorageModels;
+using Molkky.Domain.Storage;
 
 namespace Molkky.Domain.Tests;
 
@@ -222,10 +221,8 @@ public class GameTests
         var game = NewGame("Ala", "Bob", "Cyd");
         game = Play(game, ("Ala", 0), ("Bob", 1), ("Cyd", 2), ("Ala", 0), ("Bob", 5));
 
-        // Same serialisation as GameSessionStorage in the web app.
-        var json = JsonSerializer.Serialize(game.ToGameState());
-        var state = JsonSerializer.Deserialize<GameState>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        var loaded = Game.FromGameState(state!);
+        // Same serialisation as GameStore in the web app.
+        var loaded = StorageFormat.LoadGame(StorageFormat.SaveGame(game))!;
 
         Assert.Equal(2, loaded.RoundNumber);
         Assert.Equal("Cyd", loaded.CurrentPlayer.Name);

@@ -103,34 +103,32 @@
     private Game? game;
 
     [Inject]
-    private GameSessionStorage? GameStorage { get; set; }
+    private GameStore GameStore { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        if(GameStorage is not null)
+        game = await GameStore.Load();
+        if (game is null)
         {
-            game = await GameStorage.LoadGameState();
+            NavigationManager.NavigateTo("");
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(GameStorage is not null)
-        {
-            await GameStorage.SaveGameState(game);
-        }
-
-        if(game?.AnyWinner ?? false)
+        else if (game.AnyWinner)
         {
             NavigationManager.NavigateTo("endgame");
         }
     }
 
-    private void AddScore(int score)
+    // Saves every throw straight away. The winning one is saved before the endgame page reads it.
+    private async Task AddScore(int score)
     {
-        if(game is not null)
+        if (game is null) return;
+
+        game = game.Throw(score);
+        await GameStore.Save(game);
+
+        if (game.AnyWinner)
         {
-            game = game.Throw(score);
+            NavigationManager.NavigateTo("endgame");
         }
     }
 }
