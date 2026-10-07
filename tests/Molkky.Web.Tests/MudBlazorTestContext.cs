@@ -13,6 +13,8 @@ public abstract class MudBlazorTestContext : BunitContext
         // MudBlazor components call into JavaScript; let every call succeed with a default result.
         JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddMudServices();
+        Services.AddTransient<GameSessionStorage>();
+        Services.AddTransient<SettingsSessionStorage>();
         Services.AddSingleton<Translator>();
     }
 }
