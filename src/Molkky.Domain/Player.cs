@@ -72,17 +72,11 @@ public class Player
                 if (maximumPointsStrategy == MaximumPointsStrategies.MaxScoreInHalf)
                 {
                     _score = 25;
-                    AddToScoreHistory(25, isAbsolute: true);
                 }
                 if (maximumPointsStrategy == MaximumPointsStrategies.BackToZero)
                 {
                     _score = 0;
-                    AddToScoreHistory(0, isAbsolute: true);
                 }
-            }
-            else
-            {
-                AddToScoreHistory(score);
             }
         }
         else
@@ -101,18 +95,9 @@ public class Player
                     _score = 0;
                 }
             }
-            AddToScoreHistory(score);
-        }
-    }
-
-    private void AddToScoreHistory(int score, bool isAbsolute = false)
-    {
-        if (isAbsolute)
-        {
-            _scoreHistory.Add(score);
-            return;
         }
 
-        _scoreHistory.Add(score + (_scoreHistory.Any() ? _scoreHistory.Last() : 0));
+        // Record the score itself, not a running sum, so the history follows every reset.
+        _scoreHistory.Add(_score);
     }
 }
