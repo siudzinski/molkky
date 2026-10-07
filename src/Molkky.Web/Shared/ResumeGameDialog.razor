@@ -1,0 +1,23 @@
+@using Molkky.Domain
+@inherits TranslatableComponentBase
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" Align="Align.Center">@Text.ResumeGameQuestion</MudText>
+        <MudText Align="Align.Center">@string.Join(", ", Game.AllPlayers.Select(player => player.Name))</MudText>
+        <MudText Align="Align.Center">@Text.RoundLabel: @Game.RoundNumber</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="NewGame">@Text.NewGameLabel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Resume">@Text.ResumeGameButton</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter, EditorRequired] public Game Game { get; set; } = default!;
+
+    void Resume() => MudDialog?.Close(DialogResult.Ok(true));
+    void NewGame() => MudDialog?.Cancel();
+}

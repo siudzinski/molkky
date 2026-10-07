@@ -24,6 +24,8 @@ public sealed class Texts
     public required string PlayAgainLabel { get; init; }
     public required string WinnerHeaderText { get; init; }
     public required string EndgameLabel { get; init; }
+    public required string ResumeGameQuestion { get; init; }
+    public required string ResumeGameButton { get; init; }
 }
 
 public static class Translations
@@ -56,6 +58,8 @@ public static class Translations
             PlayAgainLabel = "Play again",
             WinnerHeaderText = "won the game",
             EndgameLabel = "Endgame",
+            ResumeGameQuestion = "Resume game?",
+            ResumeGameButton = "Resume",
         },
         [Polish] = new()
         {
@@ -80,6 +84,8 @@ public static class Translations
             PlayAgainLabel = "Zagraj ponownie",
             WinnerHeaderText = "wygrał rozgrywkę",
             EndgameLabel = "Podsumowanie",
+            ResumeGameQuestion = "Wznowić grę?",
+            ResumeGameButton = "Wznów",
         },
     };
 
