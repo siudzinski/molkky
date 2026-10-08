@@ -12,7 +12,7 @@
             {
                 var playing = _staying.Contains(player);
                 <li>
-                    <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-ink/5 py-1 pl-2 pr-3">
+                    <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-ink/5 py-2 pl-2 pr-3">
                         <span class="@(playing ? "flex" : "flex opacity-40")"><Avatar Letter="@player.FirstLetter" ColorClasses="@PlayerColors.For(player.ColorIndex).Avatar" /></span>
                         <span class="@(playing ? PlayingName : LeavingName)">@player.Name</span>
                         <input type="checkbox" class="size-5 shrink-0 accent-primary" checked="@playing" @onchange="() => Toggle(player)" />

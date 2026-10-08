@@ -129,16 +129,16 @@ The UI changes, the game does not: `Molkky.Domain` and its tests are untouched, 
 
 Small features on top of phase 4, agreed on 2026-10-08. The game rules do not change. Changing players between games is a new way to start the next game, tested first in `Molkky.Domain.Tests`.
 
-- [ ] Language in Settings: the switch leaves the app bar for an "App" card in Settings ("Polski / English"), apart from the game rules and their "new games" hint. Polish when nothing is saved (`<html lang="pl">` until the app starts); a saved choice stays.
-- [ ] Light/dark mode:
+- [x] Language in Settings: the switch leaves the app bar for an "App" card in Settings ("Polski / English"), apart from the game rules and their "new games" hint. Polish when nothing is saved (`<html lang="pl">` until the app starts); a saved choice stays.
+- [x] Light/dark mode:
   - System, Light or Dark, saved as `{ "version": 1, "theme": "dark" }` under `molkky.theme`; System when nothing readable is saved.
   - A sun/moon button in the app bar flips light/dark (it shows the mode it switches to); the App card in Settings has all three.
   - `data-theme` on `<html>`, set by an inline script in `index.html` before Blazor starts (no flash). The palette's dark values apply for `data-theme="dark"`, or for a dark system setting without one. The browser bar colour and native controls follow.
-- [ ] Change players between games:
+- [x] Change players between games:
   - The endgame page keeps "Play again" (same players, one tap) and adds "Change players": a sheet with the last game's players in finishing order (tap to leave someone out, tap again to bring them back) and a field to add players (removable with ×; a name already on the list brings that player back instead). Start needs 2 players.
   - `Game.PlayAgain(staying, joining, random)`: those who stay keep their finishing order and colours; each added player goes into a random place among them and gets the first colour nobody has.
-- [ ] Player colours: 8 palette tokens (`--player-1`…`--player-8`, light and dark values) on an earthy palette that avoids the lawn green, the button orange and the highlight yellow; `PlayerColors` without `dark:` variants.
-- [ ] Verified locally: 0 warnings, tests and format check green. GHPages publish served by `molkky-ghpages` at 375 px in light and dark: a fresh start is in Polish with the system theme; the theme from the app bar and from Settings survives a reload without a flash; the language from Settings; a game played to the endgame, then "Change players" with one player left out and one added; the colours in the game and the chart.
+- [x] Player colours: 8 palette tokens (`--player-1`…`--player-8`, light and dark values) on an earthy palette that avoids the lawn green, the button orange and the highlight yellow; `PlayerColors` without `dark:` variants.
+- [x] Verified locally: 0 warnings, tests and format check green. GHPages publish served by `molkky-ghpages` at 375 px in light and dark: a fresh start is in Polish with the system theme; the theme from the app bar and from Settings survives a reload, set before the app starts; the language from Settings; a game played to the endgame, then "Change players" with one player left out and one added (the newcomer took the free colour, the others kept order and colours); the colours in the game and the chart; offline the app loads in the saved theme. The pane's colour-scheme emulation fires no `change` event, so following a live system switch was checked only on reload.
 - [ ] Merge, confirm the deploy run succeeds and the live site works.
 
 ## Later: feature backlog
