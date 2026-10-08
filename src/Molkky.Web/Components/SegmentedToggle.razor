@@ -5,7 +5,7 @@
 
 <fieldset class="@Class">
     <legend class="@(HideLabel ? "sr-only" : "mb-2 font-medium")">@Label</legend>
-    <div class="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-stone-200 p-1 dark:bg-stone-800">
+    <div class="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-ink/10 p-1">
         @foreach (var option in Options)
         {
             var value = option.Value;
@@ -44,7 +44,6 @@
 
     private const string SegmentClasses =
         "flex min-h-11 cursor-pointer items-center justify-center rounded-lg px-3 py-1 text-center text-sm font-semibold transition-colors " +
-        "text-stone-600 hover:text-stone-950 has-checked:bg-white has-checked:text-stone-950 has-checked:shadow-sm " +
-        "dark:text-stone-300 dark:hover:text-white dark:has-checked:bg-stone-600 dark:has-checked:text-white " +
-        "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-emerald-600 dark:has-focus-visible:outline-emerald-400";
+        "text-muted hover:text-ink has-checked:bg-surface has-checked:text-ink has-checked:shadow-sm " +
+        "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus";
 }

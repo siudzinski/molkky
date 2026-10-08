@@ -4,7 +4,7 @@
 @* The players in this round's throwing order with the current player marked, then the players who are out.
    One table each: a row per player, headed by the name, with misses in a row and score. *@
 
-<div class="space-y-4">
+<div class="space-y-3 rounded-2xl bg-panel p-2 ring-1 ring-line backdrop-blur-md">
     @Table(Text.ThrowingOrderLabel, Game.Players, eliminated: false)
 
     @if (Game.Losers.Count > 0)
@@ -17,11 +17,11 @@
     [Parameter, EditorRequired] public Game Game { get; set; } = default!;
 
     private const string Cell = "py-2";
-    private const string CurrentCell = "py-2 bg-emerald-100 text-emerald-950 dark:bg-emerald-900/60 dark:text-emerald-50";
+    private const string CurrentCell = "py-2 bg-highlight text-on-highlight";
 
     private RenderFragment Table(string caption, IReadOnlyList<Player> players, bool eliminated) =>
         @<table class="w-full border-separate border-spacing-y-1">
-            <caption class="px-2 pb-1 text-left text-sm font-semibold text-stone-600 dark:text-stone-400">@caption</caption>
+            <caption class="px-2 pt-1 text-left text-sm font-semibold text-muted">@caption</caption>
             <thead class="sr-only">
                 <tr>
                     <td></td>
@@ -35,7 +35,7 @@
                 {
                     var current = ReferenceEquals(player, Game.CurrentPlayer);
                     var cell = current ? CurrentCell : Cell;
-                    <tr aria-current="@(current ? "true" : null)" class="@(eliminated ? "text-stone-500 dark:text-stone-400" : null)">
+                    <tr aria-current="@(current ? "true" : null)" class="@(eliminated ? "text-muted" : null)">
                         <td class="@cell w-12 rounded-l-xl pl-2">
                             <span class="@(eliminated ? "flex opacity-50" : "flex")"><Avatar Letter="@player.FirstLetter" ColorClasses="@PlayerColors.For(player.ColorIndex).Avatar" /></span>
                         </td>

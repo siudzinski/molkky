@@ -27,16 +27,14 @@
         (1, "col-start-3 row-start-4"), (2, "col-start-5 row-start-4"),
     ];
 
-    // Birch-coloured, like the pins.
+    // Birch, like the pins, standing on the lawn on a darker edge; pressed down when tapped.
     private const string PinClasses =
-        "col-span-2 aspect-square rounded-full text-2xl font-bold tabular-nums shadow-sm ring-1 transition-transform select-none touch-manipulation " +
-        "bg-amber-100 text-amber-950 ring-amber-300 hover:bg-amber-200 active:scale-95 active:bg-amber-300 " +
-        "dark:bg-amber-900/45 dark:text-amber-50 dark:ring-amber-700/70 dark:hover:bg-amber-900/70 dark:active:bg-amber-800 " +
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:focus-visible:outline-emerald-400";
+        "col-span-2 aspect-square rounded-full text-2xl font-bold tabular-nums select-none touch-manipulation transition " +
+        "bg-birch text-on-birch ring-1 ring-birch-edge/60 shadow-edge shadow-birch-edge hover:bg-birch-hover active:translate-y-0.5 active:shadow-edge-pressed " +
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 
     private const string MissClasses =
-        "flex h-14 w-full items-center justify-center rounded-2xl text-lg font-semibold transition-transform select-none touch-manipulation " +
-        "bg-stone-200 text-stone-900 hover:bg-stone-300 active:scale-[0.98] active:bg-stone-400 " +
-        "dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 dark:active:bg-stone-600 " +
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:focus-visible:outline-emerald-400";
+        "flex h-14 w-full items-center justify-center rounded-2xl text-lg font-semibold select-none touch-manipulation transition " +
+        "border border-secondary-edge bg-secondary text-ink shadow-edge shadow-secondary-edge hover:bg-secondary-hover active:translate-y-0.5 active:shadow-edge-pressed " +
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 }

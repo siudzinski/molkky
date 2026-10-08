@@ -33,6 +33,93 @@
 
 @theme {
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+    /* A raised edge under buttons and pins; pair with a colour, e.g. `shadow-edge shadow-primary-edge`. */
+    --shadow-edge: 0 3px 0 0 rgb(0 0 0 / 0.25);
+    --shadow-edge-pressed: 0 1px 0 0 rgb(0 0 0 / 0.25);
+}
+
+/*
+  The palette: what each colour is for, as utilities (bg-lawn, text-muted, ...). The values are below, once
+  for light and once for dark, so components need no dark: variants for these and a new palette is one edit.
+*/
+@theme inline {
+    --color-lawn: var(--lawn);
+    --color-lawn-far: var(--lawn-far);
+    --color-panel: var(--panel);
+    --color-surface: var(--surface);
+    --color-line: var(--line);
+    --color-ink: var(--ink);
+    --color-muted: var(--muted);
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-primary-edge: var(--primary-edge);
+    --color-on-primary: var(--on-primary);
+    --color-secondary: var(--secondary);
+    --color-secondary-hover: var(--secondary-hover);
+    --color-secondary-edge: var(--secondary-edge);
+    --color-highlight: var(--highlight);
+    --color-on-highlight: var(--on-highlight);
+    --color-birch: var(--birch);
+    --color-birch-hover: var(--birch-hover);
+    --color-birch-edge: var(--birch-edge);
+    --color-on-birch: var(--on-birch);
+    --color-danger: var(--danger);
+    --color-focus: var(--focus);
+}
+
+/* Light: a sunny lawn, frosted sage panels, white cards, orange actions, a highlighter for the current player. */
+:root {
+    --lawn: #b3cf93;
+    --lawn-far: #96bb73;
+    --panel: rgb(236 240 228 / 0.86);
+    --surface: #ffffff;
+    --line: #d5dbc8;
+    --ink: #1d2118;
+    --muted: #535a49;
+    --primary: #eb9d2a;
+    --primary-hover: #f2aa3e;
+    --primary-edge: #b06f12;
+    --on-primary: #1d2118;
+    --secondary: #ffffff;
+    --secondary-hover: #fff8ec;
+    --secondary-edge: #d8932c;
+    --highlight: #f9dd8a;
+    --on-highlight: #1d2118;
+    --birch: #f6ead2;
+    --birch-hover: #fbf3e3;
+    --birch-edge: #c4a773;
+    --on-birch: #3b2c14;
+    --danger: #c0341d;
+    --focus: #2563eb;
+}
+
+/* Dark: the same lawn at dusk. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --lawn: #1f2d1c;
+        --lawn-far: #152013;
+        --panel: rgb(31 39 29 / 0.88);
+        --surface: #252e22;
+        --line: #3a4735;
+        --ink: #eef2e8;
+        --muted: #a9b39e;
+        --primary: #eda238;
+        --primary-hover: #f4b155;
+        --primary-edge: #8f5a0e;
+        --on-primary: #1d2118;
+        --secondary: #2c3628;
+        --secondary-hover: #34402f;
+        --secondary-edge: #b9802a;
+        --highlight: #5a4a1f;
+        --on-highlight: #fbf0d4;
+        --birch: #ddcca8;
+        --birch-hover: #e8dabb;
+        --birch-edge: #8b7550;
+        --on-birch: #2a1f0d;
+        --danger: #ff8a70;
+        --focus: #8ab4ff;
+    }
 }
 
 @layer base {
@@ -42,8 +129,11 @@
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* The lawn, a little deeper towards the bottom of the screen. */
     body {
-        @apply bg-stone-100 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+        @apply bg-lawn text-ink antialiased;
+        background-image: linear-gradient(to bottom, var(--lawn), var(--lawn-far));
+        background-attachment: fixed;
     }
 
     /* FocusOnNavigate (App.razor) moves focus to each page's h1 for screen readers: no ring for that. */
