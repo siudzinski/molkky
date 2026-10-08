@@ -35,6 +35,7 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 | 2026-10-08 | Theme: System (default), Light or Dark, saved as `molkky.theme`. The app bar button flips light/dark, Settings has all three. `data-theme` on `<html>`, set by an inline script before Blazor starts | No flash of the wrong theme while the app loads, and a way back to following the system. |
 | 2026-10-08 | Player colours are 8 palette tokens (`--player-1`…`--player-8`) on an earthy "garden" palette: deep with white initials in light mode, light tints with dark initials in dark mode | The old Tailwind hues clashed with the lawn green and the orange buttons, a 6th player repeated the 1st's colour, and `dark:` variants would not follow a theme chosen in the app. |
 | 2026-10-08 | "Change players" on the endgame page: those who stay keep the finishing order and their colours; each added player goes into a random place among them and gets the first colour nobody has | "Play again" stays one tap for the usual case, and nobody's colour or place changes because someone left. |
+| 2026-10-08 | Mobile first: the unprefixed classes are the phone layout, and every screen is checked at 320 and 375 px with nothing wider than the screen (`CLAUDE.md`) | The app is used on phones. A page wider than the screen makes mobile Chrome zoom out, which cut off the "Change players" sheet. |
 
 ## Known issues (found during review, 2026-10-07)
 
@@ -43,6 +44,7 @@ Living plan for modernising the Mölkky score keeper. Each phase is one branch a
 - **Fixed in phase 3.** The domain stored MudBlazor colour names (`ColorProvider`) that the UI parsed back with `Enum.Parse(typeof(Color), …)`. It now stores a palette index that `PlayerColors` maps to the same five colours.
 - **Fixed in phase 3.** `Gameplay` and `Settings` saved state in `OnAfterRenderAsync`, i.e. on every render. They now save on change: after each throw (the winning one before going to the endgame), on each settings change and on each language toggle.
 - **Fixed in phase 4.** `index.html` set `user-scalable=no` (and `maximum-scale=1.0`), which blocked zoom (accessibility). Both are gone; pinch zoom works.
+- **Fixed after phase 5.** On a 375 px phone the endgame page was 457 px wide. `sr-only` on the chart's data table does not make a table narrower than its cells, so mobile Chrome zoomed out and the "Change players" sheet was cut off. The table now sits inside a `div.sr-only`, which clips it.
 
 ## Phase 1: .NET 10 and deploy pipeline (no behaviour change)
 
@@ -139,7 +141,9 @@ Small features on top of phase 4, agreed on 2026-10-08. The game rules do not ch
   - `Game.PlayAgain(staying, joining, random)`: those who stay keep their finishing order and colours; each added player goes into a random place among them and gets the first colour nobody has.
 - [x] Player colours: 8 palette tokens (`--player-1`…`--player-8`, light and dark values) on an earthy palette that avoids the lawn green, the button orange and the highlight yellow; `PlayerColors` without `dark:` variants.
 - [x] Verified locally: 0 warnings, tests and format check green. GHPages publish served by `molkky-ghpages` at 375 px in light and dark: a fresh start is in Polish with the system theme; the theme from the app bar and from Settings survives a reload, set before the app starts; the language from Settings; a game played to the endgame, then "Change players" with one player left out and one added (the newcomer took the free colour, the others kept order and colours); the colours in the game and the chart; offline the app loads in the saved theme. The pane's colour-scheme emulation fires no `change` event, so following a live system switch was checked only on reload.
-- [ ] Merge, confirm the deploy run succeeds and the live site works.
+- [x] Merge, confirm the deploy run succeeds (PR #5, deployed 2026-10-08). On a phone the "Change players" sheet was cut off: fixed below.
+- [x] Mobile first, written into `CLAUDE.md`. The endgame page is no wider than the phone (the chart's screen-reader table), sheets have the page's 16 px gutter on phones, and segmented toggles have more room. Every screen checked in the mobile preset at 320 and 375 px with sheets open and a long name: nothing wider than the screen.
+- [ ] Merge the fix, confirm the deploy and check the live site on a phone.
 
 ## Later: feature backlog
 

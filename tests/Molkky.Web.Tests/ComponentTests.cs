@@ -129,6 +129,21 @@ public class ComponentTests : AppTestContext
         Assert.Equal([["Bob", "0", "12"], ["Ala", "0", ""]], chart.FindAll("table tbody tr").Select(row => row.Children.Select(cell => cell.TextContent.Trim()).ToArray()));
     }
 
+    // A table is never narrower than its cells: sr-only on the table itself left it as wide as all its
+    // columns, and the endgame page scrolled sideways on a phone (Chrome zoomed out, cutting off sheets).
+    // The sr-only box around it clips it.
+    [Fact]
+    public void A_line_charts_table_is_hidden_in_a_box_that_clips_it()
+    {
+        var chart = RenderChart(new LineSeries("Bob", [0, 12, 24, 36, 48, 50], "stroke-pink-600", "bg-pink-600"));
+
+        var table = chart.Find("table");
+
+        Assert.DoesNotContain("sr-only", table.ClassList);
+        Assert.Equal("div", table.ParentElement!.LocalName);
+        Assert.Contains("sr-only", table.ParentElement.ClassList);
+    }
+
     private IRenderedComponent<LineChart> RenderChart(params LineSeries[] series) =>
         Render<LineChart>(parameters => parameters
             .Add(c => c.Title, "Score after each round")

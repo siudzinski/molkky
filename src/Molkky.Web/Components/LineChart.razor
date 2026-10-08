@@ -46,30 +46,34 @@
         </ul>
     </figcaption>
 
-    <table class="sr-only">
-        <caption>@Title</caption>
-        <thead>
-            <tr>
-                <th scope="col">@SeriesLabel</th>
-                @for (var x = 0; x < Count; x++)
-                {
-                    <th scope="col">@XLabel @x</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var series in Series)
-            {
+    @* For screen readers. sr-only on the table itself would not hide its width (a table is never narrower
+       than its cells) and the page would scroll sideways on a phone: the box around it clips it. *@
+    <div class="sr-only">
+        <table>
+            <caption>@Title</caption>
+            <thead>
                 <tr>
-                    <th scope="row">@series.Name</th>
+                    <th scope="col">@SeriesLabel</th>
                     @for (var x = 0; x < Count; x++)
                     {
-                        <td>@(x < series.Values.Count ? N(series.Values[x]) : "")</td>
+                        <th scope="col">@XLabel @x</th>
                     }
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var series in Series)
+                {
+                    <tr>
+                        <th scope="row">@series.Name</th>
+                        @for (var x = 0; x < Count; x++)
+                        {
+                            <td>@(x < series.Values.Count ? N(series.Values[x]) : "")</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </figure>
 
 @code {
