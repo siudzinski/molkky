@@ -24,7 +24,10 @@
 
         <div class="space-y-3">
             <Button Variant="ButtonVariant.Primary" Class="min-h-14 w-full text-lg" OnClick="PlayAgain">@Text.PlayAgainLabel</Button>
-            <Button Class="min-h-12 w-full" OnClick="NewGame">@Text.NewGameLabel</Button>
+            <div class="grid grid-cols-2 gap-3">
+                <Button Class="min-h-12" OnClick="() => changingPlayers = true">@Text.ChangePlayersButton</Button>
+                <Button Class="min-h-12" OnClick="NewGame">@Text.NewGameLabel</Button>
+            </div>
         </div>
 
         @* A mis-tapped winning throw goes straight here: Undo takes it back and returns to the game. *@
@@ -36,6 +39,11 @@
             </Button>
         </div>
     </div>
+
+    @if (changingPlayers)
+    {
+        <ChangePlayersSheet Game="game" OnStart="StartWithChangedPlayers" OnCancel="() => changingPlayers = false" />
+    }
 }
 
 @code {
@@ -45,6 +53,7 @@
     private Game? game;
     private Stats? stats;
     private IReadOnlyList<LineSeries> series = [];
+    private bool changingPlayers;
     // Who made the winning throw and its points: what Undo takes back.
     private (string Player, int Points) winningThrow;
 
@@ -85,6 +94,13 @@
             await GameStore.Save(game.PlayAgain());
             NavigationManager.NavigateTo("gameplay");
         }
+    }
+
+    // The next game with the players changed in the sheet: saved before the game page reads it.
+    private async Task StartWithChangedPlayers(Game next)
+    {
+        await GameStore.Save(next);
+        NavigationManager.NavigateTo("gameplay");
     }
 
     // Drops the winning throw, saved before the game page reads it.

@@ -102,6 +102,24 @@ public sealed class Game
     // Same players and settings, starting in the order they finished in; eliminated players come back.
     public Game PlayAgain() => new(Settings, AllPlayers.Select(player => player.Seat).ToList(), []);
 
+    // The same settings with changed players: those staying (players of this game, eliminated ones too)
+    // keep the order they finished in and their colour; each one joining goes into a random place among
+    // them, with the first colour nobody has.
+    public Game PlayAgain(IEnumerable<Player> staying, IEnumerable<string> joining, Random random)
+    {
+        var stayingSeats = staying.Select(player => player.Seat).ToHashSet();
+        var seats = AllPlayers.Select(player => player.Seat).Where(stayingSeats.Contains).ToList();
+        if (seats.Count != stayingSeats.Count) throw new ArgumentException("Only this game's players can stay.", nameof(staying));
+
+        foreach (var name in joining)
+        {
+            var color = Enumerable.Range(0, seats.Count + 1).First(index => seats.All(seat => seat.ColorIndex != index));
+            seats.Insert(random.Next(seats.Count + 1), new Seat(name, color));
+        }
+
+        return new Game(Settings, seats, []);
+    }
+
     // A stored game. Throws ArgumentException when the players or throws break the rules.
     internal static Game Restore(GameSettings settings, IReadOnlyList<Seat> seats, IEnumerable<int> throws) =>
         new(settings, seats, [.. throws]);

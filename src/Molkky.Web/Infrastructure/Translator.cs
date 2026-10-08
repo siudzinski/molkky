@@ -8,17 +8,17 @@ public class Translator(ILocalStorage storage)
     public const string StorageKey = "molkky.language";
     private const int Version = 1;
 
-    public string Language { get; private set; } = Translations.English;
+    public string Language { get; private set; } = Translations.Default;
 
     // Every visible string in the current language.
     public Texts Text => Translations.For(Language);
 
     public event Action? OnLanguageChanged;
 
-    // English when no language is saved, or the saved one is unreadable or not one the app has.
+    // The default language (Polish) when none is saved, or the saved one is unreadable or not one the app has.
     public async Task LoadLanguage()
     {
-        Language = Read(await storage.GetItem(StorageKey)) ?? Translations.English;
+        Language = Read(await storage.GetItem(StorageKey)) ?? Translations.Default;
     }
 
     public async Task SetLanguage(string language)

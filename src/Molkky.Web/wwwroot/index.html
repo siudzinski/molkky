@@ -1,11 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 
 <head>
     <meta charset="utf-8" />
     <!-- No maximum-scale or user-scalable=no: people must be able to zoom. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <!-- The browser bar in the colours of the app bar; the script below sets the dark one in dark mode. -->
+    <meta name="theme-color" content="#e3e9d8" />
+    <script>
+        // The theme, before anything is drawn: data-theme="light" or "dark" on <html>, from the theme saved
+        // under molkky.theme (by ThemeStore) or, without one or with "system", from the system setting, which
+        // then keeps being followed. The app passes a new choice to molkkyTheme.apply.
+        (function () {
+            var systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+            var choice = "system";
+            try {
+                var saved = JSON.parse(localStorage.getItem("molkky.theme"));
+                if (saved && saved.version === 1 && (saved.theme === "light" || saved.theme === "dark")) choice = saved.theme;
+            } catch (e) {
+                // Unreadable or no storage: follow the system.
+            }
+
+            function apply() {
+                var theme = choice === "light" || choice === "dark" ? choice : systemDark.matches ? "dark" : "light";
+                document.documentElement.setAttribute("data-theme", theme);
+                document.querySelector('meta[name="theme-color"]').setAttribute("content", theme === "dark" ? "#1f271d" : "#e3e9d8");
+            }
+
+            window.molkkyTheme = {
+                apply: function (theme) {
+                    choice = theme;
+                    apply();
+                }
+            };
+            systemDark.addEventListener("change", apply);
+            apply();
+        })();
+    </script>
     <title>Mölkky</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
@@ -13,9 +45,6 @@
     <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <!-- The browser bar in the colours of the app bar. -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e3e9d8" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f271d" />
     <link href="css/app.css" rel="stylesheet" />
     <script type="importmap"></script>
 </head>

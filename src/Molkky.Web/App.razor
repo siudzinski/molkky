@@ -1,7 +1,8 @@
 @using Molkky.Web.Infrastructure
 @inject Translator Translator
+@inject ThemeStore ThemeStore
 
-@if (isLanguageInitialized)
+@if (isLoaded)
 {
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -24,11 +25,13 @@ else
 }
 
 @code {
-    private bool isLanguageInitialized;
+    private bool isLoaded;
 
+    // The saved language and theme, before the first page shows them.
     protected override async Task OnInitializedAsync()
     {
         await Translator.LoadLanguage();
-        isLanguageInitialized = true;
+        await ThemeStore.Load();
+        isLoaded = true;
     }
 }

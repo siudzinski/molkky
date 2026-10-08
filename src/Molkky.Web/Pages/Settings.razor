@@ -10,14 +10,30 @@
 
     @if (settings is not null)
     {
-        <Card Class="space-y-6">
-            <SegmentedToggle TValue="MaximumPointsStrategies" Label="@Text.MaxScoreSettingDescription"
-                             Options="@MaximumPointsOptions" Value="settings.MaximumPoints" ValueChanged="SetMaximumPoints" />
-            <SegmentedToggle TValue="MissedThrowsStrategies" Label="@Text.MissedThrowsSettingDescription"
-                             Options="@MissedThrowsOptions" Value="settings.MissedThrows" ValueChanged="SetMissedThrows" />
-        </Card>
+        <section aria-labelledby="game-rules-heading" class="space-y-2">
+            <Card Class="space-y-4">
+                <h2 id="game-rules-heading" class="text-sm font-semibold text-muted">@Text.GameRulesLabel</h2>
+                <div class="space-y-6">
+                    <SegmentedToggle TValue="MaximumPointsStrategies" Label="@Text.MaxScoreSettingDescription"
+                                     Options="@MaximumPointsOptions" Value="settings.MaximumPoints" ValueChanged="SetMaximumPoints" />
+                    <SegmentedToggle TValue="MissedThrowsStrategies" Label="@Text.MissedThrowsSettingDescription"
+                                     Options="@MissedThrowsOptions" Value="settings.MissedThrows" ValueChanged="SetMissedThrows" />
+                </div>
+            </Card>
 
-        <p class="px-1 text-sm text-ink/80">@Text.SettingsApplyToNewGames</p>
+            <p class="px-1 text-sm text-ink/80">@Text.SettingsApplyToNewGames</p>
+        </section>
+
+        @* Saved on change, like the rules, and in use straight away. *@
+        <section aria-labelledby="app-settings-heading">
+            <Card Class="space-y-4">
+                <h2 id="app-settings-heading" class="text-sm font-semibold text-muted">@Text.AppSettingsLabel</h2>
+                <div class="space-y-6">
+                    <SegmentedToggle TValue="string" Label="@Text.LanguageLabel" Options="@LanguageOptions" Value="@Translator.Language" ValueChanged="Translator.SetLanguage" />
+                    <SegmentedToggle TValue="Theme" Label="@Text.ThemeLabel" Options="@ThemeOptions" Value="@ThemeStore.Theme" ValueChanged="ThemeStore.SetTheme" />
+                </div>
+            </Card>
+        </section>
     }
 </div>
 
@@ -26,6 +42,9 @@
 
     [Inject]
     private SettingsStore SettingsStore { get; set; } = default!;
+
+    [Inject]
+    private ThemeStore ThemeStore { get; set; } = default!;
 
     private SegmentedOption<MaximumPointsStrategies>[] MaximumPointsOptions =>
     [
@@ -39,8 +58,21 @@
         new(MissedThrowsStrategies.BackToZero, Text.MissedThrowsBackToZeroOption),
     ];
 
+    // Each language by its own name, whatever the app's language: "Polski", "English".
+    private static readonly SegmentedOption<string>[] LanguageOptions =
+        Translations.Languages.Select(language => new SegmentedOption<string>(language.Key, language.Value.LanguageName)).ToArray();
+
+    private SegmentedOption<Theme>[] ThemeOptions =>
+    [
+        new(Theme.System, Text.SystemThemeOption),
+        new(Theme.Light, Text.LightThemeOption),
+        new(Theme.Dark, Text.DarkThemeOption),
+    ];
+
     protected override async Task OnInitializedAsync()
     {
+        // The app bar switches the theme too.
+        ThemeStore.OnThemeChanged += OnThemeChanged;
         settings = await SettingsStore.Load();
     }
 
@@ -53,5 +85,17 @@
     {
         settings = changed;
         return SettingsStore.Save(changed);
+    }
+
+    private void OnThemeChanged() => InvokeAsync(StateHasChanged);
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            ThemeStore.OnThemeChanged -= OnThemeChanged;
+        }
+
+        base.Dispose(disposing);
     }
 }

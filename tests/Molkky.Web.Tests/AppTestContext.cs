@@ -8,7 +8,8 @@ using Molkky.Web.Infrastructure;
 namespace Molkky.Web.Tests;
 
 // Base class for component tests: registers what the app registers in Program.cs, with
-// localStorage in memory.
+// localStorage in memory. The texts are in English: the context starts as someone who chose English
+// (a fresh start is in Polish, see TranslatorTests).
 public abstract class AppTestContext : BunitContext
 {
     protected FakeLocalStorage Storage { get; } = new();
@@ -18,7 +19,11 @@ public abstract class AppTestContext : BunitContext
         Services.AddSingleton<ILocalStorage>(Storage);
         Services.AddSingleton<GameStore>();
         Services.AddSingleton<SettingsStore>();
-        Services.AddSingleton<Translator>();
+        Storage.Items[Translator.StorageKey] = """{"version":1,"language":"en"}""";
+        var translator = new Translator(Storage);
+        translator.LoadLanguage().GetAwaiter().GetResult();
+        Services.AddSingleton(translator);
+        Services.AddSingleton<ThemeStore>();
         Services.AddSingleton(Random.Shared);
     }
 

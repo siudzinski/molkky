@@ -60,6 +60,18 @@ public class AccessibilityTests : AppTestContext
     }
 
     [Fact]
+    public void Endgame_changing_players()
+    {
+        SaveGame(Play(Game.CreateNew(["Ala", "Bob"], GameSettings.Default), 0, 1, 0, 1, 0));
+        var page = Render<Endgame>();
+        page.FindAll("button").Single(button => button.TextContent.Trim() == "Change players").Click();
+        page.Find("[role=dialog] form input").Input("Cyd");
+        page.Find("[role=dialog] form").Submit();
+
+        EveryControlHasAName(page);
+    }
+
+    [Fact]
     public void Settings() => EveryControlHasAName(Render<Settings>());
 
     [Fact]

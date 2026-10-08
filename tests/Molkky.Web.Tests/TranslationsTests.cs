@@ -35,9 +35,10 @@ public class TranslationsTests
     }
 
     [Fact]
-    public void An_unknown_language_falls_back_to_English()
+    public void An_unknown_language_falls_back_to_Polish()
     {
-        Assert.Same(Translations.Languages[Translations.English], Translations.For("de"));
+        Assert.Same(Translations.Languages[Translations.Polish], Translations.For("de"));
+        Assert.Same(Translations.Languages[Translations.English], Translations.For("en"));
         Assert.Same(Translations.Languages[Translations.Polish], Translations.For("pl"));
     }
 }

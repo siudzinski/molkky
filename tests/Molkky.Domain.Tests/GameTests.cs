@@ -300,6 +300,102 @@ public class GameTests
         Assert.Equal([("Bob", 1), ("Cyd", 2), ("Ala", 0)], game.PlayAgain().Players.Select(p => (p.Name, p.ColorIndex)));
     }
 
+    // Between games someone leaves and someone joins: "Change players" on the endgame page.
+    // After round 1 the order is Bob (2), Cyd (5), Ala (10); the colours are Ala 0, Bob 1, Cyd 2.
+    private static Game AfterRoundOne() => Play(NewGame("Ala", "Bob", "Cyd"), ("Ala", 10), ("Bob", 2), ("Cyd", 5));
+
+    [Fact]
+    public void Play_again_without_a_player_keeps_the_others_in_order_with_their_colours()
+    {
+        var game = AfterRoundOne();
+
+        // In any order: the game's order counts.
+        var replay = game.PlayAgain(game.AllPlayers.Where(p => p.Name != "Cyd").Reverse(), [], new Random(0));
+
+        Assert.Equal([("Bob", 1), ("Ala", 0)], replay.Players.Select(p => (p.Name, p.ColorIndex)));
+        Assert.Empty(replay.Throws);
+        Assert.Equal(1, replay.RoundNumber);
+        Assert.Equal(game.Settings, replay.Settings);
+    }
+
+    [Fact]
+    public void Players_who_join_get_the_first_colours_nobody_has()
+    {
+        var game = AfterRoundOne();
+
+        var replay = game.PlayAgain(game.AllPlayers.Where(p => p.Name != "Bob"), ["Dan", "Ewa"], new Random(0));
+
+        Assert.Equal(1, replay.Players.Single(p => p.Name == "Dan").ColorIndex);
+        Assert.Equal(3, replay.Players.Single(p => p.Name == "Ewa").ColorIndex);
+        Assert.Equal(2, replay.Players.Single(p => p.Name == "Cyd").ColorIndex);
+        Assert.Equal(0, replay.Players.Single(p => p.Name == "Ala").ColorIndex);
+    }
+
+    [Fact]
+    public void Players_who_join_go_into_random_places_and_the_others_keep_their_order()
+    {
+        var game = AfterRoundOne();
+
+        var orders = Enumerable.Range(0, 20)
+            .Select(seed => Names(game.PlayAgain(game.AllPlayers, ["Dan"], new Random(seed)).Players))
+            .ToList();
+
+        Assert.All(orders, order => Assert.Equal(["Bob", "Cyd", "Ala"], order.Where(name => name != "Dan")));
+        Assert.True(orders.Select(order => Array.IndexOf(order, "Dan")).Distinct().Count() > 1);
+    }
+
+    [Fact]
+    public void Where_players_join_comes_from_the_given_randomness()
+    {
+        var game = AfterRoundOne();
+
+        var first = game.PlayAgain(game.AllPlayers, ["Dan", "Ewa"], new Random(42));
+        var second = game.PlayAgain(game.AllPlayers, ["Dan", "Ewa"], new Random(42));
+
+        Assert.Equal(Names(first.Players), Names(second.Players));
+        Assert.Equal(5, first.Players.Count);
+    }
+
+    [Fact]
+    public void Eliminated_players_who_stay_come_back()
+    {
+        var game = Play(NewGame("Ala", "Bob", "Cyd"), ("Ala", 0), ("Bob", 1), ("Cyd", 1), ("Ala", 0), ("Bob", 1), ("Cyd", 1), ("Ala", 0));
+        Assert.Equal(["Ala"], Names(game.Losers));
+
+        var replay = game.PlayAgain(game.AllPlayers.Where(p => p.Name != "Bob"), [], new Random(0));
+
+        Assert.Empty(replay.Losers);
+        Assert.Equal(["Ala", "Cyd"], Names(replay.Players).Order());
+    }
+
+    [Fact]
+    public void Play_again_with_changed_players_needs_at_least_two()
+    {
+        var game = AfterRoundOne();
+
+        Assert.Throws<ArgumentException>(() => game.PlayAgain(game.AllPlayers.Take(1), [], new Random(0)));
+        Assert.Equal(2, game.PlayAgain(game.AllPlayers.Take(1), ["Dan"], new Random(0)).Players.Count);
+    }
+
+    [Fact]
+    public void Only_the_games_players_can_stay()
+    {
+        var game = AfterRoundOne();
+        var stranger = NewGame("Ola", "Kuba").Players[0];
+
+        Assert.Throws<ArgumentException>(() => game.PlayAgain([.. game.AllPlayers, stranger], [], new Random(0)));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void A_player_who_joins_needs_a_name(string name)
+    {
+        var game = AfterRoundOne();
+
+        Assert.Throws<ArgumentException>(() => game.PlayAgain(game.AllPlayers, [name], new Random(0)));
+    }
+
     [Theory]
     [InlineData]
     [InlineData("Ala")]
