@@ -93,7 +93,7 @@ The game rules are correct and do not change. This phase changes how a game is s
 - [x] Typed translations: one object per language with `required` properties, so a missing string fails the build.
 - [x] Player colours stored as a palette index, not UI-library names.
 - [x] Verified locally: 0 warnings, tests and format check green; GHPages publish served by `molkky-ghpages` at 375 px: full games to the endgame with "max score in half" + "disqualified" and with both "back to zero"; "Resume game?" after a reload mid-game and in a new tab, resuming the exact state; settings and language kept; old or unreadable data starts fresh.
-- [ ] Merge, confirm the deploy run succeeds and the live site works.
+- [x] Merge, confirm the deploy run succeeds and the live site works (PR #3, deployed 2026-10-08, live site checked).
 
 ## Phase 4: UI rebuild (Tailwind)
 
