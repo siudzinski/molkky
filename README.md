@@ -4,10 +4,13 @@ A simple **Blazor WebAssembly** application for keeping score in the Finnish gam
 
 ## Features
 
-- **Add and manage multiple players**
-- **Automatic point calculation** based on Mölkky rules, with customizable settings
-- **Scoreboard** to display current game progress
-- **Language support**: Available in both English and Polish
+- **Score pad laid out like the pins on the field**: a tap records the throw, Undo takes it back
+- **Automatic scoring** by the Mölkky rules, with settings for going over 50 and for 3 misses in a row
+- **Scoreboard** in throwing order, and a chart of every player's score at the end
+- **Resume** an unfinished game after closing the app
+- **English and Polish**, light and dark mode
+- **Installable and works offline** (a PWA)
+
 ## Development
 
 Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and [Node.js](https://nodejs.org/) (for the Tailwind CSS build). Once, and after `package-lock.json` changes:
