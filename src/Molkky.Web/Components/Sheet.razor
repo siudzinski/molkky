@@ -1,9 +1,9 @@
-@* A modal dialog: a sheet sliding up from the bottom on phones, a centred card on wider screens. Show it
-   by rendering it; focus moves to it so screen readers announce the title. *@
+@* A modal dialog: a sheet sliding up from the bottom on phones (with the page's 16 px side gutter), a centred card
+   on wider screens. Show it by rendering it; focus moves to it so screen readers announce the title. *@
 
 <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-4">
     <div @ref="_dialog" role="dialog" aria-modal="true" aria-labelledby="@_titleId" tabindex="-1"
-         class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-surface p-6 pb-8 text-ink shadow-xl ring-1 ring-line focus:outline-none sm:rounded-3xl">
+         class="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-surface px-4 pb-8 pt-6 text-ink shadow-xl ring-1 ring-line focus:outline-none sm:rounded-3xl sm:px-6">
         <h2 id="@_titleId" class="text-xl font-bold">@Title</h2>
         <div class="mt-2 space-y-1 text-muted">@ChildContent</div>
         <div class="mt-6 grid auto-cols-fr grid-flow-col gap-3">@Actions</div>

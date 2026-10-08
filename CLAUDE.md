@@ -2,6 +2,15 @@
 
 Blazor WebAssembly (.NET 10) app for keeping score in Mölkky: an installable PWA, served as a static site from GitHub Pages at https://siudzinski.github.io/molkky/. Goals, decisions, known issues and the phase checklists live in [docs/PLAN.md](docs/PLAN.md); tick its boxes in the same PR that does the work.
 
+## Mobile first
+
+The app is played on phones, outdoors, in one hand. Every screen is designed and checked for a phone first; wider screens are the afterthought.
+
+- Unprefixed classes are the phone layout (320–430 px wide). `sm:` and up only adapt it for wider screens: the column stays `max-w-md`, a sheet becomes a centred card.
+- Nothing may be wider than the screen. Mobile Chrome zooms out to fit a page that overflows sideways, which cuts off fixed overlays such as the sheets. Long text (player names) truncates or wraps; a flex child holding text gets `min-w-0`. A screen-reader-only table goes inside `<div class="sr-only">`: on the table itself `sr-only` does not make it narrower than its cells.
+- Check in the browser pane's mobile preset (it emulates a phone) at 375 px and at 320 px, with sheets open and with a long player name. `document.documentElement.scrollWidth` must equal `clientWidth`, and `innerWidth` must stay at the width you set: a larger `innerWidth` means the page overflows and the "phone" zoomed out, not an emulation glitch.
+- Phone-sized details: touch targets of 44 px or more (see Rules), 16 px side gutters, two buttons side by side only when their labels fit at 360 px.
+
 ## Layout
 
 - `src/Molkky.Domain`: the game rules. Plain C#. `Game` (settings + starting order + throws, everything else computed by replaying them), `Player` (one player's computed state), `Rules/` (one strategy class per setting variant, and the re-sort house rule), `Storage/` (the stored JSON formats).
@@ -59,5 +68,5 @@ Blazor WebAssembly (.NET 10) app for keeping score in Mölkky: an installable PW
 ## Done means
 
 1. `dotnet build` with 0 warnings, `dotnet test` green, `dotnet format --verify-no-changes` clean.
-2. UI changes checked in the browser preview at phone width (375 px), in light and dark.
+2. UI changes checked in the browser preview's mobile preset at 375 px and 320 px, in light and dark, with nothing wider than the screen (see Mobile first).
 3. `docs/PLAN.md` updated when the work is on the plan.
