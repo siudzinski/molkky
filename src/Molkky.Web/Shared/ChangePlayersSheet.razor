@@ -1,0 +1,111 @@
+@using Molkky.Domain
+@inherits TranslatableComponentBase
+
+@* "Change players" on the endgame page: the next game without some of the players, or with new ones.
+   The players are listed in the order they finished in, everyone ticked; a tap leaves a player out, another
+   brings them back. Players added here go into random places in the next game (Game.PlayAgain). *@
+
+<Sheet Title="@Text.ChangePlayersTitle">
+    <ChildContent>
+        <ul class="space-y-1 text-ink">
+            @foreach (var player in Game.AllPlayers)
+            {
+                var playing = _staying.Contains(player);
+                <li>
+                    <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-ink/5 py-1 pl-2 pr-3">
+                        <span class="@(playing ? "flex" : "flex opacity-40")"><Avatar Letter="@player.FirstLetter" ColorClasses="@PlayerColors.For(player.ColorIndex).Avatar" /></span>
+                        <span class="@(playing ? PlayingName : LeavingName)">@player.Name</span>
+                        <input type="checkbox" class="size-5 shrink-0 accent-primary" checked="@playing" @onchange="() => Toggle(player)" />
+                    </label>
+                </li>
+            }
+            @for (var i = 0; i < _joining.Count; i++)
+            {
+                var index = i;
+                var name = _joining[i];
+                <li class="flex items-center gap-3 rounded-xl bg-ink/5 py-1 pl-2 pr-1">
+                    <Avatar Letter="@name[..1].ToUpper()" ColorClasses="bg-birch text-on-birch" />
+                    <span class="@PlayingName">@name</span>
+                    <IconButton Icon="IconName.Close" Label="@($"{Text.RemovePlayerButton} {name}")" OnClick="() => _joining.RemoveAt(index)" />
+                </li>
+            }
+        </ul>
+
+        @* Enter in the field adds the player, like the button. *@
+        <form class="flex items-end gap-2 pt-3" @onsubmit="Add">
+            <TextField Label="@Text.EnterPlayerNameLabel" @bind-Value="_name" Class="min-w-0 flex-1"
+                       autocomplete="off" autocapitalize="words" enterkeyhint="done" maxlength="30" />
+            <Button Type="submit" Class="min-h-12">
+                <Icon Name="IconName.Plus" Class="size-5" />
+                @Text.AddPlayerButton
+            </Button>
+        </form>
+
+        @if (!CanStart)
+        {
+            <p class="pt-2 text-sm text-ink/80">@Text.MinimumPlayersHint</p>
+        }
+    </ChildContent>
+    <Actions>
+        <Button Class="min-h-12" OnClick="OnCancel">@Text.CancelButton</Button>
+        <Button Variant="ButtonVariant.Primary" Class="min-h-12" Disabled="!CanStart" OnClick="Start">@Text.StartGameButton</Button>
+    </Actions>
+</Sheet>
+
+@code {
+    private HashSet<Player> _staying = [];
+    private readonly List<string> _joining = [];
+    private string? _name;
+
+    // The finished game.
+    [Parameter, EditorRequired] public Game Game { get; set; } = default!;
+
+    // The next game, not saved yet.
+    [Parameter] public EventCallback<Game> OnStart { get; set; }
+
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    [Inject]
+    private Random Random { get; set; } = default!;
+
+    private bool CanStart => _staying.Count + _joining.Count >= 2;
+
+    private const string PlayingName = "min-w-0 flex-1 truncate font-medium";
+    private const string LeavingName = "min-w-0 flex-1 truncate font-medium text-muted line-through";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _staying = [.. Game.AllPlayers];
+    }
+
+    private void Toggle(Player player)
+    {
+        if (!_staying.Remove(player))
+        {
+            _staying.Add(player);
+        }
+    }
+
+    // A name already on the list brings that player back rather than adding them twice.
+    private void Add()
+    {
+        var name = _name?.Trim();
+        _name = string.Empty;
+        if (string.IsNullOrEmpty(name)) return;
+
+        var player = Game.AllPlayers.FirstOrDefault(player => SameName(player.Name, name));
+        if (player is not null)
+        {
+            _staying.Add(player);
+        }
+        else if (!_joining.Any(joining => SameName(joining, name)))
+        {
+            _joining.Add(name);
+        }
+    }
+
+    private static bool SameName(string a, string b) => string.Equals(a, b, StringComparison.CurrentCultureIgnoreCase);
+
+    private Task Start() => OnStart.InvokeAsync(Game.PlayAgain(_staying, _joining, Random));
+}

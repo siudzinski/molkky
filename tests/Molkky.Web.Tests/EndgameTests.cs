@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -110,6 +111,141 @@ public class EndgameTests : AppTestContext
         page.FindAll("button").Single(button => button.TextContent.Trim() == "New game").Click();
 
         Assert.Equal("http://localhost/", Uri);
+    }
+
+    // "Change players": the sheet lists the players in the order they finished in (Cyd, Ala, Bob; colours
+    // Ala 0, Bob 1, Cyd 2), each a checkbox labelled with their name.
+    private static IRenderedComponent<Endgame> ChangePlayers(IRenderedComponent<Endgame> page)
+    {
+        page.FindAll("button").Single(button => button.TextContent.Trim() == "Change players").Click();
+        return page;
+    }
+
+    private static string[] Listed(IRenderedComponent<Endgame> page) =>
+        page.FindAll("[role=dialog] li span.truncate").Select(name => name.TextContent.Trim()).ToArray();
+
+    private static IElement Checkbox(IRenderedComponent<Endgame> page, string name) =>
+        page.FindAll("[role=dialog] label:has(input[type=checkbox])")
+            .Single(label => label.QuerySelector("span.truncate")!.TextContent.Trim() == name)
+            .QuerySelector("input[type=checkbox]")!;
+
+    private static void AddPlayer(IRenderedComponent<Endgame> page, string name)
+    {
+        page.Find("[role=dialog] form input").Input(name);
+        page.Find("[role=dialog] form").Submit();
+    }
+
+    private static IElement SheetButton(IRenderedComponent<Endgame> page, string text) =>
+        page.FindAll("[role=dialog] button").Single(button => button.TextContent.Trim() == text);
+
+    [Fact]
+    public void Change_players_lists_everyone_in_the_order_they_finished_in_all_playing()
+    {
+        SaveGame(WonByBob());
+
+        var page = ChangePlayers(Render<Endgame>());
+
+        Assert.Equal("Who's playing?", page.Find("[role=dialog] h2").TextContent);
+        Assert.Equal(["Cyd", "Ala", "Bob"], Listed(page));
+        Assert.All(["Cyd", "Ala", "Bob"], name => Assert.True(Checkbox(page, name).HasAttribute("checked")));
+    }
+
+    [Fact]
+    public void Start_saves_the_next_game_without_who_left_and_with_who_joined_then_opens_it()
+    {
+        var game = WonByBob();
+        SaveGame(game);
+        Game? savedWhenLeaving = null;
+        Services.GetRequiredService<NavigationManager>().LocationChanged += (_, _) => savedWhenLeaving = SavedGame();
+        var page = ChangePlayers(Render<Endgame>());
+
+        Checkbox(page, "Cyd").Change(false);
+        AddPlayer(page, " Dan ");
+        Assert.Equal(["Cyd", "Ala", "Bob", "Dan"], Listed(page));
+        SheetButton(page, "Start game").Click();
+
+        page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
+        Assert.Empty(savedWhenLeaving!.Throws);
+        Assert.Equal(game.Settings, savedWhenLeaving.Settings);
+        // Ala and Bob in the order they finished in, Dan somewhere among them with Cyd's free colour.
+        Assert.Equal(["Ala", "Bob"], savedWhenLeaving.Players.Select(p => p.Name).Where(name => name != "Dan"));
+        Assert.Equal([("Ala", 0), ("Bob", 1), ("Dan", 2)], savedWhenLeaving.Players.Select(p => (p.Name, p.ColorIndex)).Order());
+    }
+
+    [Fact]
+    public void A_tap_brings_back_a_player_left_out()
+    {
+        SaveGame(WonByBob());
+        var page = ChangePlayers(Render<Endgame>());
+
+        Checkbox(page, "Ala").Change(false);
+        Assert.False(Checkbox(page, "Ala").HasAttribute("checked"));
+
+        Checkbox(page, "Ala").Change(true);
+
+        Assert.True(Checkbox(page, "Ala").HasAttribute("checked"));
+    }
+
+    [Theory]
+    [InlineData("Cyd")]
+    [InlineData("cyd")]
+    public void A_name_already_on_the_list_brings_that_player_back(string name)
+    {
+        SaveGame(WonByBob());
+        var page = ChangePlayers(Render<Endgame>());
+        Checkbox(page, "Cyd").Change(false);
+
+        AddPlayer(page, name);
+
+        Assert.Equal(["Cyd", "Ala", "Bob"], Listed(page));
+        Assert.True(Checkbox(page, "Cyd").HasAttribute("checked"));
+        Assert.Equal("", page.Find("[role=dialog] form input").GetAttribute("value"));
+    }
+
+    [Fact]
+    public void A_player_added_twice_is_listed_once_and_can_be_removed()
+    {
+        SaveGame(WonByBob());
+        var page = ChangePlayers(Render<Endgame>());
+
+        AddPlayer(page, "Dan");
+        AddPlayer(page, "DAN");
+        Assert.Equal(["Cyd", "Ala", "Bob", "Dan"], Listed(page));
+
+        page.Find("[role=dialog] button[aria-label='Remove Dan']").Click();
+
+        Assert.Equal(["Cyd", "Ala", "Bob"], Listed(page));
+    }
+
+    [Fact]
+    public void Start_needs_two_players()
+    {
+        SaveGame(WonByBob());
+        var page = ChangePlayers(Render<Endgame>());
+
+        Checkbox(page, "Ala").Change(false);
+        Checkbox(page, "Bob").Change(false);
+
+        Assert.True(SheetButton(page, "Start game").HasAttribute("disabled"));
+        Assert.Contains("Add at least 2 players to start.", page.Find("[role=dialog]").TextContent);
+
+        AddPlayer(page, "Dan");
+
+        Assert.False(SheetButton(page, "Start game").HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void Cancel_closes_the_sheet_and_saves_nothing()
+    {
+        SaveGame(WonByBob());
+        var page = ChangePlayers(Render<Endgame>());
+        Checkbox(page, "Cyd").Change(false);
+
+        SheetButton(page, "Cancel").Click();
+
+        Assert.Empty(page.FindAll("[role=dialog]"));
+        Assert.Empty(Storage.Writes);
+        Assert.EndsWith("/", Uri);
     }
 
     [Fact]
