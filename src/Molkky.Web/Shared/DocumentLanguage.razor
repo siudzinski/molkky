@@ -1,0 +1,20 @@
+@using Molkky.Web.Infrastructure
+@implements IDisposable
+@inject Translator Translator
+@inject IJSRuntime JS
+
+@* Keeps <html lang> on the app's language, so screen readers read Polish as Polish. Renders nothing. *@
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Translator.OnLanguageChanged += OnLanguageChanged;
+        await Apply();
+    }
+
+    private void OnLanguageChanged() => _ = InvokeAsync(Apply);
+
+    private async Task Apply() => await JS.InvokeVoidAsync("document.documentElement.setAttribute", "lang", Translator.Language);
+
+    public void Dispose() => Translator.OnLanguageChanged -= OnLanguageChanged;
+}
