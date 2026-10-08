@@ -5,7 +5,7 @@
 
 <fieldset class="@Class">
     <legend class="@(HideLabel ? "sr-only" : "mb-2 font-medium")">@Label</legend>
-    <div class="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-ink/10 p-1">
+    <div class="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-track p-1">
         @foreach (var option in Options)
         {
             var value = option.Value;
@@ -18,8 +18,7 @@
 </fieldset>
 
 @code {
-    private static int _instances;
-    private readonly string _name = $"segmented-{Interlocked.Increment(ref _instances)}";
+    private readonly string _name = ElementIds.Next("segmented");
 
     [Parameter, EditorRequired] public string Label { get; set; } = default!;
 
@@ -44,6 +43,6 @@
 
     private const string SegmentClasses =
         "flex min-h-11 cursor-pointer items-center justify-center rounded-lg px-3 py-1 text-center text-sm font-semibold transition-colors " +
-        "text-muted hover:text-ink has-checked:bg-surface has-checked:text-ink has-checked:shadow-sm " +
+        "text-muted hover:text-ink has-checked:bg-selected has-checked:text-ink has-checked:shadow-sm " +
         "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus";
 }

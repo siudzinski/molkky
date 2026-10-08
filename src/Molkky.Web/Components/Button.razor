@@ -28,13 +28,13 @@
 
     private const string Base =
         "inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl font-semibold transition " +
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed";
 
     private string VariantClasses => Variant switch
     {
-        // Raised on an edge of a darker shade, and pressed down when tapped.
-        ButtonVariant.Primary => "bg-primary text-on-primary shadow-edge shadow-primary-edge enabled:hover:bg-primary-hover enabled:active:translate-y-0.5 enabled:active:shadow-edge-pressed",
-        ButtonVariant.Ghost => "text-ink enabled:hover:bg-ink/5 enabled:active:bg-ink/10",
-        _ => "border border-secondary-edge bg-secondary text-ink shadow-edge shadow-secondary-edge enabled:hover:bg-secondary-hover enabled:active:translate-y-0.5 enabled:active:shadow-edge-pressed",
+        // Raised on an edge of a darker shade and pressed down when tapped; flat and faint when disabled.
+        ButtonVariant.Primary => "bg-primary text-on-primary shadow-edge shadow-primary-edge enabled:hover:bg-primary-hover enabled:active:translate-y-0.5 enabled:active:shadow-edge-pressed disabled:bg-ink/10 disabled:text-ink/45 disabled:shadow-none",
+        ButtonVariant.Ghost => "text-ink enabled:hover:bg-ink/5 enabled:active:bg-ink/10 disabled:text-ink/35",
+        _ => "border border-secondary-edge bg-secondary text-ink shadow-edge shadow-secondary-edge enabled:hover:bg-secondary-hover enabled:active:translate-y-0.5 enabled:active:shadow-edge-pressed disabled:border-line disabled:bg-surface/50 disabled:text-ink/45 disabled:shadow-none",
     };
 }

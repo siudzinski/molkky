@@ -1,0 +1,32 @@
+@* A labelled text input. 16 px text, so phones do not zoom in on focus. Extra attributes (autocomplete,
+   maxlength, ...) go to the <input>. *@
+
+<div class="@Class">
+    <label for="@_id" class="mb-1.5 block text-sm font-medium text-muted">@Label</label>
+    <input id="@_id" class="@InputClasses" value="@Value" @oninput="Input" @attributes="AdditionalAttributes" />
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("text-field");
+
+    [Parameter, EditorRequired] public string Label { get; set; } = default!;
+
+    [Parameter] public string? Value { get; set; }
+
+    // On every keystroke, so the value is current whenever a button or Enter uses it.
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private Task Input(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString();
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+    private const string InputClasses =
+        "block min-h-12 w-full rounded-xl border border-line bg-surface px-4 text-base text-ink shadow-inner shadow-ink/5 " +
+        "placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus";
+}

@@ -58,6 +58,8 @@
     --color-secondary: var(--secondary);
     --color-secondary-hover: var(--secondary-hover);
     --color-secondary-edge: var(--secondary-edge);
+    --color-track: var(--track);
+    --color-selected: var(--selected);
     --color-highlight: var(--highlight);
     --color-on-highlight: var(--on-highlight);
     --color-birch: var(--birch);
@@ -84,6 +86,8 @@
     --secondary: #ffffff;
     --secondary-hover: #fff8ec;
     --secondary-edge: #d8932c;
+    --track: rgb(29 33 24 / 0.09);
+    --selected: #ffffff;
     --highlight: #f9dd8a;
     --on-highlight: #1d2118;
     --birch: #f6ead2;
@@ -111,6 +115,8 @@
         --secondary: #2c3628;
         --secondary-hover: #34402f;
         --secondary-edge: #b9802a;
+        --track: rgb(0 0 0 / 0.28);
+        --selected: #46543f;
         --highlight: #5a4a1f;
         --on-highlight: #fbf0d4;
         --birch: #ddcca8;
