@@ -9,7 +9,13 @@
     <title>Mölkky</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <!-- The browser bar in the colours of the app bar. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e3e9d8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f271d" />
     <link href="css/app.css" rel="stylesheet" />
     <script type="importmap"></script>
 </head>
@@ -23,6 +29,13 @@
     </div>
 
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script>
+        // Offline support. The URL is relative to <base href>, so on GitHub Pages it is /molkky/service-worker.js
+        // with the scope /molkky/. updateViaCache none: each check for a new version goes past the HTTP cache.
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" });
+        }
+    </script>
 </body>
 
 </html>

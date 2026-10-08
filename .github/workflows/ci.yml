@@ -57,3 +57,7 @@ jobs:
           # A processed index.html: fingerprints filled in and the Brotli loader added
           if grep -q '#\[\.{fingerprint}\]' publish/wwwroot/index.html; then echo "index.html was not processed"; exit 1; fi
           grep -q 'brotliloader.min.js' publish/wwwroot/index.html
+          # PWA: the offline service worker (not the development one), its asset list with the .br files, the manifest
+          grep -q 'molkky-offline-' publish/wwwroot/service-worker.js
+          grep -q '\.wasm\.br"' publish/wwwroot/service-worker-assets.js
+          test -f publish/wwwroot/manifest.webmanifest
