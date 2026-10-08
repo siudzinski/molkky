@@ -6,33 +6,47 @@
 
 <PageTitle>@Text.NewGameLabel</PageTitle>
 
-<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-    <MudGrid>
-        <MudItem xs="12" sm="12" md="12">
-            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">@Text.NewGameLabel</MudText>
-        </MudItem>
-        @foreach(var name in playerNames)
+<div class="space-y-4">
+    <h1 class="px-1 text-3xl font-bold tracking-tight">@Text.NewGameLabel</h1>
+
+    <Card Class="space-y-4">
+        @* Enter in the field adds the player, like the button. *@
+        <form class="flex items-end gap-2" @onsubmit="AddPlayer">
+            <TextField Label="@Text.EnterPlayerNameLabel" @bind-Value="playerName" Class="min-w-0 flex-1"
+                       autocomplete="off" autocapitalize="words" enterkeyhint="done" maxlength="30" />
+            <Button Type="submit" Class="min-h-12">
+                <Icon Name="IconName.Plus" Class="size-5" />
+                @Text.AddPlayerButton
+            </Button>
+        </form>
+
+        @if (playerNames.Count > 0)
         {
-            <MudItem xs="12" sm="6" md="4">
-                <MudChip Class="full-width-chip" Size="Size.Large" Color="Color.Primary" OnClick="@(() => RemovePlayer(name))">
-                    <MudAvatar Size="Size.Large" Color="Color.Tertiary">@name.Substring(0, 1).ToUpper()</MudAvatar>
-                    @name
-                </MudChip>
-            </MudItem>
+            <section aria-labelledby="players-heading" class="space-y-2">
+                <h2 id="players-heading" class="text-sm font-semibold text-muted">@Text.PlayersLabel</h2>
+                <ul class="space-y-1">
+                    @for (var i = 0; i < playerNames.Count; i++)
+                    {
+                        var index = i;
+                        var name = playerNames[i];
+                        <li class="flex items-center gap-3 rounded-xl bg-ink/5 py-1 pl-2 pr-1">
+                            <Avatar Letter="@name[..1].ToUpper()" ColorClasses="bg-birch text-on-birch" />
+                            <span class="min-w-0 flex-1 truncate font-medium">@name</span>
+                            <IconButton Icon="IconName.Close" Label="@($"{Text.RemovePlayerButton} {name}")" OnClick="() => RemovePlayer(index)" />
+                        </li>
+                    }
+                </ul>
+            </section>
         }
-        <MudItem xs="12" sm="12" md="12">
-            <MudTextField @bind-Value="playerName" Label="@Text.EnterPlayerNameLabel" Variant="Variant.Outlined" 
-                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.PersonOutline"
-                          @onkeyup="HandleKeyPress" />
-        </MudItem>
-        <MudItem xs="12" sm="12" md="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="AddPlayer">@Text.AddPlayerButton</MudButton>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="12">
-            <MudButton Variant="Variant.Filled" OnClick="StartGame" FullWidth="true" Color="Color.Primary" Disabled="@StartGameDisabled">@Text.StartGameButton</MudButton>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+    </Card>
+
+    <Button Variant="ButtonVariant.Primary" Class="min-h-14 w-full text-lg" Disabled="@StartGameDisabled" OnClick="StartGame">@Text.StartGameButton</Button>
+
+    @if (StartGameDisabled)
+    {
+        <p class="px-1 text-center text-sm text-ink/80">@Text.MinimumPlayersHint</p>
+    }
+</div>
 
 @code {
     private string? playerName;
@@ -50,14 +64,14 @@
     {
         if (!string.IsNullOrWhiteSpace(playerName))
         {
-            playerNames.Add(playerName);
+            playerNames.Add(playerName.Trim());
             playerName = string.Empty;
         }
     }
 
-    private void RemovePlayer(string name)
+    private void RemovePlayer(int index)
     {
-        playerNames.Remove(name);
+        playerNames.RemoveAt(index);
     }
 
     private async Task StartGame()
@@ -69,13 +83,5 @@
         playerName = string.Empty;
 
         NavigationManager.NavigateTo("gameplay");
-    }
-
-    private void HandleKeyPress(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            AddPlayer();
-        }
     }
 }

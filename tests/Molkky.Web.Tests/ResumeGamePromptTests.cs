@@ -3,7 +3,6 @@ using Molkky.Domain;
 using Molkky.Domain.Storage;
 using Molkky.Web.Infrastructure;
 using Molkky.Web.Shared;
-using MudBlazor;
 
 namespace Molkky.Web.Tests;
 
@@ -17,27 +16,22 @@ public class ResumeGamePromptTests : MudBlazorTestContext
     private static Game FinishedGame() =>
         new[] { 0, 1, 0, 1, 0 }.Aggregate(Game.CreateNew(["Ala", "Bob"], GameSettings.Default), (game, points) => game.Throw(points));
 
-    // In the app the prompt and the dialog provider both sit in MainLayout.
-    private IRenderedComponent<MudDialogProvider> RenderPrompt()
-    {
-        var dialogs = Render<MudDialogProvider>();
-        Render<ResumeGamePrompt>();
-        return dialogs;
-    }
+    // In the app the prompt sits in MainLayout, so it runs once per app start.
+    private IRenderedComponent<ResumeGamePrompt> RenderPrompt() => Render<ResumeGamePrompt>();
 
-    private static void Click(IRenderedComponent<MudDialogProvider> dialogs, string text) =>
-        dialogs.FindAll("button").Single(button => button.TextContent.Trim() == text).Click();
+    private static void Click(IRenderedComponent<ResumeGamePrompt> prompt, string text) =>
+        prompt.FindAll("button").Single(button => button.TextContent.Trim() == text).Click();
 
     [Fact]
     public void Offers_to_resume_a_saved_unfinished_game()
     {
         SaveGame(UnfinishedGame());
 
-        var dialogs = RenderPrompt();
+        var prompt = RenderPrompt();
 
-        dialogs.WaitForAssertion(() => Assert.Contains("Resume game?", dialogs.Markup));
-        Assert.Contains("Cyd, Bob, Ala", dialogs.Markup);
-        Assert.Contains("Round: 2", dialogs.Markup);
+        prompt.WaitForAssertion(() => Assert.Contains("Resume game?", prompt.Markup));
+        Assert.Contains("Cyd, Bob, Ala", prompt.Markup);
+        Assert.Contains("Round 2", prompt.Markup);
     }
 
     [Fact]
@@ -45,26 +39,26 @@ public class ResumeGamePromptTests : MudBlazorTestContext
     {
         SaveGame(UnfinishedGame());
         var saved = Storage.Items[GameStore.Key];
-        var dialogs = RenderPrompt();
-        dialogs.WaitForAssertion(() => Assert.Contains("Resume game?", dialogs.Markup));
+        var prompt = RenderPrompt();
+        prompt.WaitForAssertion(() => Assert.Contains("Resume game?", prompt.Markup));
 
-        Click(dialogs, "Resume");
+        Click(prompt, "Resume");
 
-        dialogs.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
+        prompt.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
         Assert.Equal(saved, Storage.Items[GameStore.Key]);
-        Assert.DoesNotContain("Resume game?", dialogs.Markup);
+        Assert.DoesNotContain("Resume game?", prompt.Markup);
     }
 
     [Fact]
     public void New_game_discards_the_saved_game()
     {
         SaveGame(UnfinishedGame());
-        var dialogs = RenderPrompt();
-        dialogs.WaitForAssertion(() => Assert.Contains("Resume game?", dialogs.Markup));
+        var prompt = RenderPrompt();
+        prompt.WaitForAssertion(() => Assert.Contains("Resume game?", prompt.Markup));
 
-        Click(dialogs, "New game");
+        Click(prompt, "New game");
 
-        dialogs.WaitForAssertion(() => Assert.False(Storage.Items.ContainsKey(GameStore.Key)));
+        prompt.WaitForAssertion(() => Assert.False(Storage.Items.ContainsKey(GameStore.Key)));
         Assert.Equal("http://localhost/", Uri);
     }
 
@@ -73,17 +67,17 @@ public class ResumeGamePromptTests : MudBlazorTestContext
     {
         SaveGame(FinishedGame());
 
-        var dialogs = RenderPrompt();
+        var prompt = RenderPrompt();
 
-        Assert.DoesNotContain("Resume game?", dialogs.Markup);
+        Assert.DoesNotContain("Resume game?", prompt.Markup);
     }
 
     [Fact]
     public void Nothing_is_offered_without_a_saved_game()
     {
-        var dialogs = RenderPrompt();
+        var prompt = RenderPrompt();
 
-        Assert.DoesNotContain("Resume game?", dialogs.Markup);
+        Assert.DoesNotContain("Resume game?", prompt.Markup);
     }
 
     [Theory]
@@ -94,9 +88,9 @@ public class ResumeGamePromptTests : MudBlazorTestContext
     {
         Storage.Items[GameStore.Key] = json;
 
-        var dialogs = RenderPrompt();
+        var prompt = RenderPrompt();
 
-        Assert.DoesNotContain("Resume game?", dialogs.Markup);
+        Assert.DoesNotContain("Resume game?", prompt.Markup);
         Assert.Null(StorageFormat.LoadGame(json));
     }
 }

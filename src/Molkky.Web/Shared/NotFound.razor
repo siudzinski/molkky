@@ -1,0 +1,13 @@
+@inherits TranslatableComponentBase
+
+@* The router's page for an address the app does not have. *@
+
+<PageTitle>@Text.NotFoundTitle</PageTitle>
+
+<div class="space-y-4">
+    <h1 class="px-1 text-3xl font-bold tracking-tight">@Text.NotFoundTitle</h1>
+    <Card Class="space-y-4">
+        <p role="alert">@Text.NotFoundMessage</p>
+        <a href="" class="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-focus">@Text.NewGameLabel</a>
+    </Card>
+</div>

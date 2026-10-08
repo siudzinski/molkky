@@ -35,6 +35,13 @@ public sealed class Texts
     public required string LanguageLabel { get; init; }
     // The language's own name, e.g. "Polski": what the language switch calls it in every language.
     public required string LanguageName { get; init; }
+    public required string PlayersLabel { get; init; }
+    public required string RemovePlayerButton { get; init; }
+    public required string MinimumPlayersHint { get; init; }
+    public required string SettingsApplyToNewGames { get; init; }
+    public required string ScoreChartTitle { get; init; }
+    public required string NotFoundTitle { get; init; }
+    public required string NotFoundMessage { get; init; }
 }
 
 public static class Translations
@@ -55,12 +62,12 @@ public static class Translations
             RoundLabel = "Round",
             ScoreLabel = "Score",
             SettingsLabel = "Settings",
-            MaxScoreSettingDescription = "What happens when player scores more than maximum points?",
-            MaxScoreInHalfOption = "Max score in half",
-            MaxScoreBackToZeroOption = "Back to zero",
+            MaxScoreSettingDescription = "What happens when a player scores more than 50?",
+            MaxScoreInHalfOption = "Back to 25",
+            MaxScoreBackToZeroOption = "Back to 0",
             MissedThrowsSettingDescription = "What happens when a player throws 3 misses in a row?",
             MissedThrowsDisqualifiedOption = "Disqualified",
-            MissedThrowsBackToZeroOption = "Back to zero",
+            MissedThrowsBackToZeroOption = "Back to 0",
             PlayAgainLabel = "Play again",
             WinnerHeaderText = "won the game",
             EndgameLabel = "Endgame",
@@ -77,6 +84,13 @@ public static class Translations
             MenuButton = "Menu",
             LanguageLabel = "Language",
             LanguageName = "English",
+            PlayersLabel = "Players",
+            RemovePlayerButton = "Remove",
+            MinimumPlayersHint = "Add at least 2 players to start.",
+            SettingsApplyToNewGames = "A new game starts with these settings.",
+            ScoreChartTitle = "Score after each round",
+            NotFoundTitle = "Not found",
+            NotFoundMessage = "Sorry, there's nothing at this address.",
         },
         [Polish] = new()
         {
@@ -89,12 +103,12 @@ public static class Translations
             RoundLabel = "Runda",
             ScoreLabel = "Wynik",
             SettingsLabel = "Ustawienia",
-            MaxScoreSettingDescription = "Co się stanie jeśli gracz przekroczy maksymalną liczbę punktów?",
-            MaxScoreInHalfOption = "Maksymalny wynik dzielimy na pół",
-            MaxScoreBackToZeroOption = "Wraca do zera",
-            MissedThrowsSettingDescription = "Co się stanie jeśli gracz spudłuje trzy razy pod rząd?",
+            MaxScoreSettingDescription = "Co się stanie, jeśli gracz przekroczy 50 punktów?",
+            MaxScoreInHalfOption = "Wraca do 25",
+            MaxScoreBackToZeroOption = "Wraca do 0",
+            MissedThrowsSettingDescription = "Co się stanie, jeśli gracz spudłuje trzy razy z rzędu?",
             MissedThrowsDisqualifiedOption = "Dyskwalifikacja",
-            MissedThrowsBackToZeroOption = "Wraca do zera",
+            MissedThrowsBackToZeroOption = "Wraca do 0",
             PlayAgainLabel = "Zagraj ponownie",
             WinnerHeaderText = "wygrał rozgrywkę",
             EndgameLabel = "Podsumowanie",
@@ -111,6 +125,13 @@ public static class Translations
             MenuButton = "Menu",
             LanguageLabel = "Język",
             LanguageName = "Polski",
+            PlayersLabel = "Gracze",
+            RemovePlayerButton = "Usuń",
+            MinimumPlayersHint = "Dodaj co najmniej 2 graczy, aby zacząć.",
+            SettingsApplyToNewGames = "Nowa gra rozpocznie się z tymi ustawieniami.",
+            ScoreChartTitle = "Wynik po każdej rundzie",
+            NotFoundTitle = "Nie znaleziono",
+            NotFoundMessage = "Niestety, pod tym adresem nic nie ma.",
         },
     };
 

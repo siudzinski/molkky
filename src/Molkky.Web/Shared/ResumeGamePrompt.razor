@@ -1,32 +1,45 @@
+@using Molkky.Domain
 @using Molkky.Web.Infrastructure
+@inherits TranslatableComponentBase
 @inject GameStore GameStore
-@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 
 @* Once per app start (it sits in MainLayout): offers to carry on with a saved, unfinished game. *@
 
+@if (game is not null)
+{
+    <Sheet Title="@Text.ResumeGameQuestion">
+        <ChildContent>
+            <p class="font-medium text-ink">@string.Join(", ", game.AllPlayers.Select(player => player.Name))</p>
+            <p>@Text.RoundLabel @game.RoundNumber</p>
+        </ChildContent>
+        <Actions>
+            <Button Class="min-h-12" OnClick="NewGame">@Text.NewGameLabel</Button>
+            <Button Variant="ButtonVariant.Primary" Class="min-h-12" OnClick="Resume">@Text.ResumeGameButton</Button>
+        </Actions>
+    </Sheet>
+}
+
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private Game? game;
+
+    protected override async Task OnInitializedAsync()
     {
-        // After the first render, so the dialog provider next to it in MainLayout is ready.
-        if (!firstRender) return;
+        var saved = await GameStore.Load();
+        game = saved is { AnyWinner: false } ? saved : null;
+    }
 
-        var game = await GameStore.Load();
-        if (game is null || game.AnyWinner) return;
+    private void Resume()
+    {
+        game = null;
+        NavigationManager.NavigateTo("gameplay");
+    }
 
-        var parameters = new DialogParameters<ResumeGameDialog> { { dialog => dialog.Game, game } };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, NoHeader = true, DisableBackdropClick = true, CloseOnEscapeKey = false };
-        var dialog = await DialogService.ShowAsync<ResumeGameDialog>("", parameters, options);
-        var result = await dialog.Result;
-
-        if (result.Canceled)
-        {
-            await GameStore.Clear();
-            NavigationManager.NavigateTo("");
-        }
-        else
-        {
-            NavigationManager.NavigateTo("gameplay");
-        }
+    // Discards the saved game.
+    private async Task NewGame()
+    {
+        game = null;
+        await GameStore.Clear();
+        NavigationManager.NavigateTo("");
     }
 }
