@@ -1,0 +1,10 @@
+/* Source of wwwroot/css/app.css, which the build generates with the Tailwind CLI (npm run build:css). */
+
+/* No preflight (Tailwind's base reset) yet: MudBlazor still styles the app. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* Tailwind only generates the classes it finds here: write class names whole, never concatenated. */
+@source "../**/*.razor";
+@source "../**/*.cs";
+@source "../wwwroot/index.html";

@@ -25,8 +25,21 @@
       "problemMatcher": []
     },
     {
+      "label": "watch:css",
+      "detail": "Regenerate the Tailwind CSS whenever a .razor, .cs or Styles file changes",
+      "type": "npm",
+      "script": "watch:css",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "tailwindcss",
+        "pattern": { "regexp": "error: (.*)$", "message": 1 },
+        "background": { "activeBegins": true, "beginsPattern": "tailwindcss", "endsPattern": "Done in" }
+      }
+    },
+    {
       "label": "watch",
-      "detail": "Dev server with hot reload on http://localhost:5295",
+      "detail": "Dev server with hot reload on http://localhost:5295, with the Tailwind CSS watcher",
+      "dependsOn": "watch:css",
       "type": "process",
       "command": "dotnet",
       "args": ["watch", "--project", "src/Molkky.Web/Molkky.Web.csproj", "--launch-profile", "http"],

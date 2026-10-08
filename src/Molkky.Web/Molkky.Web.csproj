@@ -15,4 +15,36 @@
     <ProjectReference Include="..\Molkky.Domain\Molkky.Domain.csproj" />
   </ItemGroup>
 
+  <!--
+    Tailwind CSS: every build generates wwwroot/css/app.css (not in git) from Styles/app.css and the
+    classes used in the .razor and .cs files, with the CLI from the repo root's node_modules (`npm ci`).
+    It runs only when one of its inputs changed, and a failing CLI fails the build.
+  -->
+  <PropertyGroup>
+    <NpmRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), package.json))</NpmRoot>
+    <TailwindOutput>wwwroot\css\app.css</TailwindOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TailwindInput Include="Styles\**\*.css;**\*.razor;**\*.cs;wwwroot\index.html" Exclude="bin\**;obj\**" />
+    <TailwindInput Include="$(NpmRoot)\package-lock.json" />
+  </ItemGroup>
+
+  <Target Name="BuildTailwindCss" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'"
+          Inputs="@(TailwindInput)" Outputs="$(TailwindOutput)">
+    <Error Condition="!Exists('$(NpmRoot)\node_modules\@tailwindcss\cli')"
+           Text="Tailwind CSS is not installed. Run `npm ci` in $(NpmRoot) (needs Node.js), then build again." />
+    <Exec Command="npm run --silent build:css" WorkingDirectory="$(NpmRoot)" StandardErrorImportance="high" />
+    <!-- The CLI leaves an unchanged output untouched, which would make it look out of date forever. -->
+    <Touch Files="$(TailwindOutput)" />
+  </Target>
+
+  <!-- The SDK collects wwwroot when the project loads, so on a clean checkout it missed the generated file. -->
+  <Target Name="IncludeTailwindCss" AfterTargets="BuildTailwindCss" Condition="'$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <Content Remove="$(TailwindOutput)" />
+      <Content Include="$(TailwindOutput)" />
+    </ItemGroup>
+  </Target>
+
 </Project>

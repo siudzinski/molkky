@@ -22,6 +22,17 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Every build of the Web project (tests and publish included) generates its Tailwind CSS
+      # with the CLI from node_modules
+      - name: Install npm packages
+        run: npm ci
+
       - name: Restore
         run: dotnet restore molkky.slnx
 
@@ -43,3 +54,6 @@ jobs:
         run: |
           grep -q '<base href="/molkky/" />' publish/wwwroot/index.html
           test -f publish/wwwroot/404.html
+          # A processed index.html: fingerprints filled in and the Brotli loader added
+          if grep -q '#\[\.{fingerprint}\]' publish/wwwroot/index.html; then echo "index.html was not processed"; exit 1; fi
+          grep -q 'brotliloader.min.js' publish/wwwroot/index.html
