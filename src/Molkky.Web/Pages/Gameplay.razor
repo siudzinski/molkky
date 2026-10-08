@@ -1,4 +1,5 @@
 @page "/gameplay"
+@layout AppLayout
 @using Molkky.Domain
 @using Molkky.Web.Infrastructure
 @inherits TranslatableComponentBase
@@ -6,129 +7,105 @@
 
 <PageTitle>Mölkky</PageTitle>
 
-<MudContainer Class="mt-8 px-8" MaxWidth="MaxWidth.False">
-    <MudGrid>
-        <MudItem xs="12">
-            <MudGrid Justify="Justify.FlexEnd" Spacing="0">
-                <MudItem>
-                    <MudIcon Icon="@Icons.Material.Filled.Alarm" />
-                </MudItem>
-                <MudItem>
-                    <MudText>@Text.RoundLabel: @game?.RoundNumber</MudText>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="pa-4" Elevation="1">
-                @if (game?.CurrentPlayer != null)
-                {
-                    <MudGrid>
-                        <MudItem xs="4">
-                            <MudAvatar Size="Size.Large" Color="@PlayerColors.For(game.CurrentPlayer.ColorIndex)">@game.CurrentPlayer.FirstLetter</MudAvatar>
-                        </MudItem>
-                        <MudItem xs="8">
-                            <MudGrid>
-                                <MudItem xs="8">
-                                    <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
-                                    <MudText>@Text.ScoreLabel: @game.CurrentPlayer.Score</MudText>
-                                </MudItem>
-                                <MudItem xs="4">
-                                    @if (game.CurrentPlayer.InDanger)
-                                    {
-                                        @for(int i = 0; i < game.CurrentPlayer.NumberOfFailedThrows; i++)
-                                        {
-                                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
-                                        }
-                                    }
-                                </MudItem>
-                            </MudGrid>
-                        </MudItem>
-                    </MudGrid>
-                }
-            </MudPaper>
-        </MudItem>
-        <Keyboard OnScoreAdded="AddScore" />
-        <MudDivider />
-        @if(game is not null)
-        {
-            @foreach (var player in game.Players)
+@if (game is not null)
+{
+    var player = game.CurrentPlayer;
+
+    <div class="space-y-4">
+        <Card Class="space-y-3">
+            <div class="flex items-center gap-2">
+                <p class="text-sm font-medium text-stone-600 dark:text-stone-400">@Text.RoundLabel @game.RoundNumber</p>
+                <div class="ml-auto flex min-w-0 items-center gap-1">
+                    @if (lastThrow is { } last)
+                    {
+                        <p class="truncate text-sm text-stone-600 dark:text-stone-400"><span class="sr-only">@Text.LastThrowLabel: </span>@last.Name · @(last.Points == 0 ? Text.MissButton : last.Points.ToString())</p>
+                    }
+                    <Button Variant="ButtonVariant.Ghost" Class="-mr-2" Disabled="!game.CanUndo" OnClick="Undo">
+                        <Icon Name="IconName.Undo" Class="size-5" />
+                        @Text.UndoButton
+                    </Button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4" aria-live="polite">
+                <Avatar Large="true" Letter="@player.FirstLetter" ColorClasses="@PlayerColors.For(player.ColorIndex).Avatar" />
+                <div class="min-w-0 flex-1">
+                    <h1 class="truncate text-2xl font-bold">@player.Name</h1>
+                    <p class="text-sm text-stone-600 dark:text-stone-400">@Text.ToWinLabel: @(Game.PointsToWin - player.Score)</p>
+                </div>
+                <p class="text-5xl font-extrabold tabular-nums">@player.Score</p>
+            </div>
+
+            @if (player.InDanger)
             {
-                <MudItem xs="12" sm="6" md="4" lg="3">
-                    <MudCard>
-                        <MudCardContent>
-                            <MudGrid>
-                                <MudItem xs="4">
-                                    <MudAvatar Size="Size.Large" Color="@PlayerColors.For(player.ColorIndex)">@player.FirstLetter</MudAvatar>
-                                </MudItem>
-                                <MudItem xs="8">
-                                    <MudGrid>
-                                        <MudItem xs="8">
-                                            <MudText Typo="Typo.h6">@player.Name</MudText>
-                                            <MudText>@Text.ScoreLabel: @player.Score</MudText>
-                                        </MudItem>
-                                        <MudItem xs="4" >
-                                            @if (player.InDanger)
-                                            {
-                                                @for(int i = 0; i < player.NumberOfFailedThrows; i++)
-                                                {
-                                                    <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
-                                                }
-                                            }
-                                        </MudItem>
-                                    </MudGrid>
-                                </MudItem>
-                            </MudGrid>
-                        </MudCardContent>
-                    </MudCard>
-                </MudItem>
+                <p class="flex items-center gap-2 text-sm font-semibold text-red-700 dark:text-red-400">
+                    <MissMarks Count="player.NumberOfFailedThrows" />
+                    @Text.MissesInARowLabel
+                </p>
             }
-            @if(game.Losers.Any())
-            {
-                <MudDivider />
-                @foreach (var loser in game.Losers)
-                {
-                    <MudItem xs="12" sm="6" md="4">
-                    <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
-                        <MudAvatar Size="Size.Large" Color="@PlayerColors.For(loser.ColorIndex)">@loser.FirstLetter</MudAvatar>
-                        @loser.Name
-                    </MudChip>
-                </MudItem>
-                }
-            }
-        }
-    </MudGrid>
-</MudContainer>
+        </Card>
+
+        <ScorePad OnThrow="Throw" />
+
+        <Scoreboard Game="game" />
+    </div>
+}
 
 @code {
     private Game? game;
+    // Who made the last throw and its points: what Undo takes back.
+    private (string Name, int Points)? lastThrow;
 
     [Inject]
     private GameStore GameStore { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        game = await GameStore.Load();
-        if (game is null)
+        var saved = await GameStore.Load();
+        if (saved is null)
         {
             NavigationManager.NavigateTo("");
         }
-        else if (game.AnyWinner)
+        else if (saved.AnyWinner)
         {
             NavigationManager.NavigateTo("endgame");
         }
+        else
+        {
+            Show(saved);
+        }
     }
 
-    // Saves every throw straight away. The winning one is saved before the endgame page reads it.
-    private async Task AddScore(int score)
+    private async Task Throw(int points)
     {
-        if (game is null) return;
+        if (game is null || game.AnyWinner) return;
 
-        game = game.Throw(score);
-        await GameStore.Save(game);
+        await Save(game.Throw(points));
 
         if (game.AnyWinner)
         {
             NavigationManager.NavigateTo("endgame");
         }
+    }
+
+    private async Task Undo()
+    {
+        if (game is not { CanUndo: true }) return;
+
+        await Save(game.Undo());
+    }
+
+    // Saves every change straight away: each throw (the winning one before the endgame page reads it) and each undo.
+    private async Task Save(Game changed)
+    {
+        Show(changed);
+        await GameStore.Save(changed);
+    }
+
+    private void Show(Game shown)
+    {
+        game = shown;
+        // The player before the last throw is the one who made it.
+        lastThrow = shown.CanUndo ? (shown.Undo().CurrentPlayer.Name, shown.Throws[^1]) : null;
     }
 }

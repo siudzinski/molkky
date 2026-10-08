@@ -11,9 +11,6 @@ public sealed class Texts
     public required string SettingsNavLink { get; init; }
     public required string RoundLabel { get; init; }
     public required string ScoreLabel { get; init; }
-    public required string CancelButton { get; init; }
-    public required string ConfirmButton { get; init; }
-    public required string AddScoreLabel { get; init; }
     public required string SettingsLabel { get; init; }
     public required string MaxScoreSettingDescription { get; init; }
     public required string MaxScoreInHalfOption { get; init; }
@@ -26,6 +23,18 @@ public sealed class Texts
     public required string EndgameLabel { get; init; }
     public required string ResumeGameQuestion { get; init; }
     public required string ResumeGameButton { get; init; }
+    public required string MissButton { get; init; }
+    public required string UndoButton { get; init; }
+    public required string LastThrowLabel { get; init; }
+    public required string ToWinLabel { get; init; }
+    public required string MissesInARowLabel { get; init; }
+    public required string PlayerLabel { get; init; }
+    public required string ThrowingOrderLabel { get; init; }
+    public required string EliminatedLabel { get; init; }
+    public required string MenuButton { get; init; }
+    public required string LanguageLabel { get; init; }
+    // The language's own name, e.g. "Polski": what the language switch calls it in every language.
+    public required string LanguageName { get; init; }
 }
 
 public static class Translations
@@ -45,9 +54,6 @@ public static class Translations
             SettingsNavLink = "Settings",
             RoundLabel = "Round",
             ScoreLabel = "Score",
-            CancelButton = "Cancel",
-            ConfirmButton = "Confirm",
-            AddScoreLabel = "Add score",
             SettingsLabel = "Settings",
             MaxScoreSettingDescription = "What happens when player scores more than maximum points?",
             MaxScoreInHalfOption = "Max score in half",
@@ -60,6 +66,17 @@ public static class Translations
             EndgameLabel = "Endgame",
             ResumeGameQuestion = "Resume game?",
             ResumeGameButton = "Resume",
+            MissButton = "Miss",
+            UndoButton = "Undo",
+            LastThrowLabel = "Last throw",
+            ToWinLabel = "To win",
+            MissesInARowLabel = "Misses in a row",
+            PlayerLabel = "Player",
+            ThrowingOrderLabel = "Throwing order",
+            EliminatedLabel = "Out of the game",
+            MenuButton = "Menu",
+            LanguageLabel = "Language",
+            LanguageName = "English",
         },
         [Polish] = new()
         {
@@ -71,9 +88,6 @@ public static class Translations
             SettingsNavLink = "Ustawienia",
             RoundLabel = "Runda",
             ScoreLabel = "Wynik",
-            CancelButton = "Anuluj",
-            ConfirmButton = "Potwierdź",
-            AddScoreLabel = "Dodać wynik",
             SettingsLabel = "Ustawienia",
             MaxScoreSettingDescription = "Co się stanie jeśli gracz przekroczy maksymalną liczbę punktów?",
             MaxScoreInHalfOption = "Maksymalny wynik dzielimy na pół",
@@ -86,6 +100,17 @@ public static class Translations
             EndgameLabel = "Podsumowanie",
             ResumeGameQuestion = "Wznowić grę?",
             ResumeGameButton = "Wznów",
+            MissButton = "Pudło",
+            UndoButton = "Cofnij",
+            LastThrowLabel = "Ostatni rzut",
+            ToWinLabel = "Do wygranej",
+            MissesInARowLabel = "Pudła z rzędu",
+            PlayerLabel = "Gracz",
+            ThrowingOrderLabel = "Kolejność rzutów",
+            EliminatedLabel = "Poza grą",
+            MenuButton = "Menu",
+            LanguageLabel = "Język",
+            LanguageName = "Polski",
         },
     };
 

@@ -1,0 +1,10 @@
+@inherits LayoutComponentBase
+
+@* Phone-first: one column, at most 28rem wide on larger screens. *@
+
+<div class="flex min-h-dvh flex-col bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
+    <AppBar />
+    <main class="mx-auto w-full max-w-md flex-1 px-4 pb-10 pt-4">
+        @Body
+    </main>
+</div>
