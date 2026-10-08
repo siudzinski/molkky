@@ -12,6 +12,7 @@ builder.Services.AddSingleton<ILocalStorage, BrowserLocalStorage>();
 builder.Services.AddSingleton<GameStore>();
 builder.Services.AddSingleton<SettingsStore>();
 builder.Services.AddSingleton<Translator>();
+builder.Services.AddSingleton<ThemeStore>();
 builder.Services.AddSingleton(Random.Shared);
 
 await builder.Build().RunAsync();

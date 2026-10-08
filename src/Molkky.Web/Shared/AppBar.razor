@@ -1,12 +1,17 @@
+@using Molkky.Web.Infrastructure
 @inherits TranslatableComponentBase
+@inject ThemeStore ThemeStore
 
-@* The bar on top of every page: the menu with the pages, the app's name, and the language switch. *@
+@* The bar on top of every page: the menu with the pages, the app's name, and the light/dark switch. *@
 
 <header class="sticky top-0 z-40 border-b border-line bg-panel backdrop-blur-md">
     <div class="relative mx-auto flex h-16 max-w-md items-center gap-1 px-2">
         <IconButton Icon="IconName.Menu" Label="@Text.MenuButton" OnClick="ToggleMenu" aria-expanded="@(_menuOpen ? "true" : "false")" aria-controls="app-menu" />
         <span class="text-xl font-bold tracking-tight">Mölkky</span>
-        <div class="ml-auto"><LanguageSwitch /></div>
+        @* The switch to the other theme: the stylesheet shows the button that fits the theme on screen (dark: is
+           data-theme on <html>), which follows the system until a theme is chosen. *@
+        <span class="ml-auto flex dark:hidden"><IconButton Icon="IconName.Moon" Label="@Text.DarkThemeButton" OnClick="() => ThemeStore.SetTheme(Theme.Dark)" /></span>
+        <span class="ml-auto hidden dark:flex"><IconButton Icon="IconName.Sun" Label="@Text.LightThemeButton" OnClick="() => ThemeStore.SetTheme(Theme.Light)" /></span>
 
         @if (_menuOpen)
         {

@@ -8,11 +8,13 @@ namespace Molkky.Web.Tests;
 
 public class AppBarTests : AppTestContext
 {
-    private Translator Translator => Services.GetRequiredService<Translator>();
+    private const string ApplyTheme = "molkkyTheme.apply";
 
-    private static IElement Language(IRenderedComponent<AppBar> bar, string name) => bar.Find($"input[type=radio][aria-label={name}]");
+    private ThemeStore ThemeStore => Services.GetRequiredService<ThemeStore>();
 
     private static IElement MenuButton(IRenderedComponent<AppBar> bar) => bar.Find("button[aria-controls=app-menu]");
+
+    private static IElement Button(IRenderedComponent<AppBar> bar, string label) => bar.Find($"button[aria-label='{label}']");
 
     [Fact]
     public void Showing_the_bar_saves_nothing()
@@ -23,31 +25,34 @@ public class AppBarTests : AppTestContext
         Assert.Empty(Storage.Writes);
     }
 
+    // Both buttons are on the page; the stylesheet shows the one for the other theme (see app.css, dark:).
     [Fact]
-    public void Switching_the_language_saves_it_and_translates_the_app()
+    public void The_theme_buttons_are_shown_by_the_theme_on_screen()
     {
         var bar = Render<AppBar>();
-        Assert.True(Language(bar, "English").HasAttribute("checked"));
 
-        Language(bar, "Polski").Change(true);
+        var toDark = Button(bar, "Switch to dark mode").ParentElement!.ClassList;
+        var toLight = Button(bar, "Switch to light mode").ParentElement!.ClassList;
 
-        bar.WaitForAssertion(() => Assert.Equal("""{"version":1,"language":"pl"}""", Storage.Items[Translator.StorageKey]));
-        Assert.Equal(Translations.Polish, Translator.Language);
-        Assert.True(Language(bar, "Polski").HasAttribute("checked"));
-        MenuButton(bar).Click();
-        Assert.Equal(["Nowa gra", "Ustawienia"], bar.FindAll("nav a").Select(link => link.TextContent.Trim()));
+        Assert.Contains("dark:hidden", toDark);
+        Assert.DoesNotContain("hidden", toDark);
+        Assert.Contains("hidden", toLight);
+        Assert.Contains("dark:flex", toLight);
     }
 
-    [Fact]
-    public async Task Shows_the_saved_language_as_selected()
+    [Theory]
+    [InlineData("Switch to dark mode", Theme.Dark, "dark")]
+    [InlineData("Switch to light mode", Theme.Light, "light")]
+    public void A_theme_button_applies_and_saves_its_theme(string label, Theme theme, string name)
     {
-        Storage.Items[Translator.StorageKey] = """{"version":1,"language":"pl"}""";
-        await Translator.LoadLanguage();
-
+        JSInterop.SetupVoid(ApplyTheme, name).SetVoidResult();
         var bar = Render<AppBar>();
 
-        Assert.True(Language(bar, "Polski").HasAttribute("checked"));
-        Assert.False(Language(bar, "English").HasAttribute("checked"));
+        Button(bar, label).Click();
+
+        bar.WaitForAssertion(() => Assert.Equal($$"""{"version":1,"theme":"{{name}}"}""", Storage.Items[ThemeStore.StorageKey]));
+        Assert.Equal(theme, ThemeStore.Theme);
+        JSInterop.VerifyInvoke(ApplyTheme);
     }
 
     [Fact]
@@ -66,6 +71,18 @@ public class AppBarTests : AppTestContext
 
         Assert.Empty(bar.FindAll("nav"));
         Assert.Equal("false", MenuButton(bar).GetAttribute("aria-expanded"));
+    }
+
+    [Fact]
+    public async Task The_menu_is_in_the_apps_language()
+    {
+        var bar = Render<AppBar>();
+
+        await Services.GetRequiredService<Translator>().SetLanguage(Translations.Polish);
+        MenuButton(bar).Click();
+
+        bar.WaitForAssertion(() => Assert.Equal(["Nowa gra", "Ustawienia"], bar.FindAll("nav a").Select(link => link.TextContent.Trim())));
+        Assert.Equal("Włącz tryb ciemny", bar.FindAll("button")[1].GetAttribute("aria-label"));
     }
 
     [Fact]

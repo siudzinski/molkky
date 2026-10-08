@@ -20,6 +20,19 @@ public class TranslatorTests
         Assert.Equal("Nowa gra", translator.Text.NewGameLabel);
     }
 
+    // Before 2026-10-08 English was the default: someone who chose it keeps it.
+    [Fact]
+    public async Task A_saved_English_stays()
+    {
+        _storage.Items[Translator.StorageKey] = """{"version":1,"language":"en"}""";
+        var translator = new Translator(_storage);
+
+        await translator.LoadLanguage();
+
+        Assert.Equal(Translations.English, translator.Language);
+        Assert.Equal("New game", translator.Text.NewGameLabel);
+    }
+
     [Fact]
     public async Task A_language_change_is_announced()
     {
@@ -27,7 +40,7 @@ public class TranslatorTests
         var announced = 0;
         translator.OnLanguageChanged += () => announced++;
 
-        await translator.SetLanguage(Translations.Polish);
+        await translator.SetLanguage(Translations.English);
 
         Assert.Equal(1, announced);
     }
@@ -35,22 +48,22 @@ public class TranslatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    [InlineData("pl")]
+    [InlineData("en")]
     [InlineData("not json")]
     [InlineData("null")]
     [InlineData("[]")]
     [InlineData("{}")]
-    [InlineData("""{"version":2,"language":"pl"}""")]
-    [InlineData("""{"language":"pl"}""")]
+    [InlineData("""{"version":2,"language":"en"}""")]
+    [InlineData("""{"language":"en"}""")]
     [InlineData("""{"version":1,"language":null}""")]
     [InlineData("""{"version":1,"language":"de"}""")]
-    public async Task Without_a_readable_saved_language_the_app_is_in_English(string? json)
+    public async Task Without_a_readable_saved_language_the_app_is_in_Polish(string? json)
     {
         if (json is not null) _storage.Items[Translator.StorageKey] = json;
         var translator = new Translator(_storage);
 
         await translator.LoadLanguage();
 
-        Assert.Equal(Translations.English, translator.Language);
+        Assert.Equal(Translations.Polish, translator.Language);
     }
 }

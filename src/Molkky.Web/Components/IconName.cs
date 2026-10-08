@@ -8,4 +8,6 @@ public enum IconName
     Undo,
     Trophy,
     Plus,
+    Sun,
+    Moon,
 }

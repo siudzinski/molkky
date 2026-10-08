@@ -23,7 +23,16 @@ public class TranslatableComponentBase : ComponentBase, IDisposable
 
     public void Dispose()
     {
-        Translator.OnLanguageChanged -= OnLanguageChanged;
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    // A component that subscribes to more overrides this, and calls it.
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Translator.OnLanguageChanged -= OnLanguageChanged;
+        }
     }
 }

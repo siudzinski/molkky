@@ -7,6 +7,9 @@
 @source "../**/*.cs";
 @source "../wwwroot/index.html";
 
+/* dark: follows the app's theme (data-theme on <html>), not only the system setting. Prefer palette tokens. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Inter (SIL Open Font License, wwwroot/fonts), self-hosted so the app works offline. Paths are relative to
    wwwroot/css/app.css. */
 @font-face {
@@ -115,51 +118,54 @@
     --on-player: #ffffff;
 }
 
-/* Dark: the same lawn at dusk. */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --lawn: #1f2d1c;
-        --lawn-far: #152013;
-        --panel: rgb(31 39 29 / 0.88);
-        --surface: #252e22;
-        --line: #3a4735;
-        --ink: #eef2e8;
-        --muted: #a9b39e;
-        --primary: #eda238;
-        --primary-hover: #f4b155;
-        --primary-edge: #8f5a0e;
-        --on-primary: #1d2118;
-        --secondary: #2c3628;
-        --secondary-hover: #34402f;
-        --secondary-edge: #b9802a;
-        --track: rgb(0 0 0 / 0.28);
-        --selected: #46543f;
-        --highlight: #5a4a1f;
-        --on-highlight: #fbf0d4;
-        --birch: #ddcca8;
-        --birch-hover: #e8dabb;
-        --birch-edge: #8b7550;
-        --on-birch: #2a1f0d;
-        --danger: #ff8a70;
-        --focus: #8ab4ff;
-        /* Players: light tints of the same colours under a dark initial. */
-        --player-1: #f08a74;
-        --player-2: #7fb3e6;
-        --player-3: #c99ad0;
-        --player-4: #6cc4b8;
-        --player-5: #c9a58c;
-        --player-6: #f08aab;
-        --player-7: #aaa5ec;
-        --player-8: #c4cad3;
-        --on-player: #1d2118;
-    }
+/* Dark: the same lawn at dusk. For data-theme="dark" on <html>, which the script in index.html sets from the
+   saved theme or the system setting. */
+:root[data-theme="dark"] {
+    --lawn: #1f2d1c;
+    --lawn-far: #152013;
+    --panel: rgb(31 39 29 / 0.88);
+    --surface: #252e22;
+    --line: #3a4735;
+    --ink: #eef2e8;
+    --muted: #a9b39e;
+    --primary: #eda238;
+    --primary-hover: #f4b155;
+    --primary-edge: #8f5a0e;
+    --on-primary: #1d2118;
+    --secondary: #2c3628;
+    --secondary-hover: #34402f;
+    --secondary-edge: #b9802a;
+    --track: rgb(0 0 0 / 0.28);
+    --selected: #46543f;
+    --highlight: #5a4a1f;
+    --on-highlight: #fbf0d4;
+    --birch: #ddcca8;
+    --birch-hover: #e8dabb;
+    --birch-edge: #8b7550;
+    --on-birch: #2a1f0d;
+    --danger: #ff8a70;
+    --focus: #8ab4ff;
+    /* Players: light tints of the same colours under a dark initial. */
+    --player-1: #f08a74;
+    --player-2: #7fb3e6;
+    --player-3: #c99ad0;
+    --player-4: #6cc4b8;
+    --player-5: #c9a58c;
+    --player-6: #f08aab;
+    --player-7: #aaa5ec;
+    --player-8: #c4cad3;
+    --on-player: #1d2118;
 }
 
 @layer base {
-    /* Light or dark as the system is set; native controls and scrollbars follow. */
+    /* Light or dark as the page's theme is (data-theme); native controls and scrollbars follow. */
     html {
-        color-scheme: light dark;
+        color-scheme: light;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    html[data-theme="dark"] {
+        color-scheme: dark;
     }
 
     /* The lawn, a little deeper towards the bottom of the screen. */
