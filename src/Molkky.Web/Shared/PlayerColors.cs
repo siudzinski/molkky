@@ -4,19 +4,23 @@ namespace Molkky.Web.Shared;
 // Avatar: background and initial. Line and Swatch: the endgame chart's line and legend dot.
 public sealed record PlayerColor(string Avatar, string Line, string Swatch);
 
-// Maps a player's palette index (Player.ColorIndex) to their colour. The hues keep the order players had
-// in the app before (primary, secondary, info, success, warning). Shades keep the white initial readable;
-// chart lines get lighter on the dark background.
+// Maps a player's palette index (Player.ColorIndex) to their colour: the player-1 … player-8 tokens in
+// Styles/app.css, each with a light and a dark value. Ordered so that the first few players differ most.
 public static class PlayerColors
 {
     private static readonly PlayerColor[] Palette =
     [
-        new("bg-violet-600 text-white", "stroke-violet-600 dark:stroke-violet-400", "bg-violet-600 dark:bg-violet-400"),
-        new("bg-pink-600 text-white", "stroke-pink-600 dark:stroke-pink-400", "bg-pink-600 dark:bg-pink-400"),
-        new("bg-sky-700 text-white", "stroke-sky-600 dark:stroke-sky-400", "bg-sky-600 dark:bg-sky-400"),
-        new("bg-green-700 text-white", "stroke-green-600 dark:stroke-green-400", "bg-green-600 dark:bg-green-400"),
-        new("bg-orange-600 text-white", "stroke-orange-500 dark:stroke-orange-400", "bg-orange-500 dark:bg-orange-400"),
+        new("bg-player-1 text-on-player", "stroke-player-1", "bg-player-1"),
+        new("bg-player-2 text-on-player", "stroke-player-2", "bg-player-2"),
+        new("bg-player-3 text-on-player", "stroke-player-3", "bg-player-3"),
+        new("bg-player-4 text-on-player", "stroke-player-4", "bg-player-4"),
+        new("bg-player-5 text-on-player", "stroke-player-5", "bg-player-5"),
+        new("bg-player-6 text-on-player", "stroke-player-6", "bg-player-6"),
+        new("bg-player-7 text-on-player", "stroke-player-7", "bg-player-7"),
+        new("bg-player-8 text-on-player", "stroke-player-8", "bg-player-8"),
     ];
+
+    public static int Count => Palette.Length;
 
     public static PlayerColor For(int colorIndex) => Palette[colorIndex % Palette.Length];
 }

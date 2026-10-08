@@ -1,52 +1,78 @@
+using System.Text.RegularExpressions;
 using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
 public class PlayerColorsTests
 {
-    // The five colours, in the order players had them before: primary (violet), secondary (pink),
-    // info (blue), success (green), warning (orange).
+    private static IEnumerable<PlayerColor> Palette => Enumerable.Range(0, PlayerColors.Count).Select(PlayerColors.For);
+
+    [Fact]
+    public void There_are_eight_colours()
+    {
+        Assert.Equal(8, PlayerColors.Count);
+    }
+
     [Theory]
-    [InlineData(0, "bg-violet-600")]
-    [InlineData(1, "bg-pink-600")]
-    [InlineData(2, "bg-sky-700")]
-    [InlineData(3, "bg-green-700")]
-    [InlineData(4, "bg-orange-600")]
+    [InlineData(0, "bg-player-1")]
+    [InlineData(1, "bg-player-2")]
+    [InlineData(4, "bg-player-5")]
+    [InlineData(7, "bg-player-8")]
     public void Each_palette_index_has_its_colour(int index, string avatarBackground)
     {
         Assert.Contains(avatarBackground, PlayerColors.For(index).Avatar.Split(' '));
     }
 
     [Theory]
-    [InlineData(5, "bg-violet-600")]
-    [InlineData(6, "bg-pink-600")]
-    [InlineData(11, "bg-pink-600")]
-    public void The_palette_repeats_after_five_players(int index, string avatarBackground)
+    [InlineData(8, 0)]
+    [InlineData(9, 1)]
+    [InlineData(15, 7)]
+    public void The_palette_repeats_after_eight_players(int index, int sameAs)
     {
-        Assert.Contains(avatarBackground, PlayerColors.For(index).Avatar.Split(' '));
-        Assert.Equal(PlayerColors.For(index % 5), PlayerColors.For(index));
+        Assert.Equal(PlayerColors.For(sameAs), PlayerColors.For(index));
     }
 
     [Fact]
-    public void The_five_colours_differ_in_every_use()
+    public void The_colours_differ_in_every_use()
     {
-        var palette = Enumerable.Range(0, 5).Select(PlayerColors.For).ToList();
-
-        Assert.Distinct(palette.Select(color => color.Avatar));
-        Assert.Distinct(palette.Select(color => color.Line));
-        Assert.Distinct(palette.Select(color => color.Swatch));
+        Assert.Distinct(Palette.Select(color => color.Avatar));
+        Assert.Distinct(Palette.Select(color => color.Line));
+        Assert.Distinct(Palette.Select(color => color.Swatch));
     }
 
-    // Every colour is readable on the light and the dark background: white initials, and its own
-    // dark-mode shade for the chart.
+    // The palette tokens carry the light and the dark value, so the colours follow the theme the app is
+    // in, also when it is chosen in the app rather than by the system: no dark: variants.
     [Fact]
-    public void Each_colour_has_white_initials_and_a_dark_mode_shade_for_the_chart()
+    public void Each_colour_is_made_of_palette_tokens()
     {
-        Assert.All(Enumerable.Range(0, 5).Select(PlayerColors.For), color =>
+        Assert.All(Palette, color =>
         {
-            Assert.Contains("text-white", color.Avatar.Split(' '));
-            Assert.Contains(color.Line.Split(' '), name => name.StartsWith("dark:stroke-", StringComparison.Ordinal));
-            Assert.Contains(color.Swatch.Split(' '), name => name.StartsWith("dark:bg-", StringComparison.Ordinal));
+            Assert.Matches(@"^bg-player-\d text-on-player$", color.Avatar);
+            Assert.Matches(@"^stroke-player-\d$", color.Line);
+            Assert.Matches(@"^bg-player-\d$", color.Swatch);
         });
+    }
+
+    [Fact]
+    public void Each_token_has_a_light_and_a_dark_value()
+    {
+        var css = File.ReadAllText(Path.Combine(RepositoryRoot(), "src", "Molkky.Web", "Styles", "app.css"));
+
+        foreach (var token in Enumerable.Range(1, PlayerColors.Count).Select(n => $"--player-{n}").Append("--on-player"))
+        {
+            Assert.Contains($"--color-{token[2..]}: var({token});", css);
+            Assert.Equal(2, Regex.Count(css, $@"^\s*{token}: #[0-9a-f]{{6}};", RegexOptions.Multiline));
+        }
+    }
+
+    private static string RepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "molkky.slnx")))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName ?? throw new InvalidOperationException("molkky.slnx not found above the test output.");
     }
 }
