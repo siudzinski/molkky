@@ -1,0 +1,6 @@
+/* While pages move from MudBlazor to Tailwind: MudBlazor's CSS in a cascade layer above Tailwind's base and
+   below its utilities, so its global rules (`* { margin: 0; padding: 0 }`, `button { ... }`) cannot override
+   the utilities. Linked before css/app.css; goes with MudBlazor. */
+@layer theme, base, mudblazor, components, utilities;
+
+@import url("../_content/MudBlazor/MudBlazor.min.css") layer(mudblazor);

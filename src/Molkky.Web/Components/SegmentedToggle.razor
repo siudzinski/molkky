@@ -1,0 +1,50 @@
+@typeparam TValue
+
+@* One choice out of a few, as segments side by side. Native radio buttons underneath, so arrow keys move
+   between the segments and the group is one tab stop. *@
+
+<fieldset class="@Class">
+    <legend class="@(HideLabel ? "sr-only" : "mb-2 font-medium")">@Label</legend>
+    <div class="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-stone-200 p-1 dark:bg-stone-800">
+        @foreach (var option in Options)
+        {
+            var value = option.Value;
+            <label class="@SegmentClasses" title="@option.Title">
+                <input type="radio" class="sr-only" name="@_name" checked="@IsSelected(value)" aria-label="@option.Title" @onchange="() => Select(value)" />
+                @option.Text
+            </label>
+        }
+    </div>
+</fieldset>
+
+@code {
+    private static int _instances;
+    private readonly string _name = $"segmented-{Interlocked.Increment(ref _instances)}";
+
+    [Parameter, EditorRequired] public string Label { get; set; } = default!;
+
+    // Keeps the label for screen readers only, where the segments speak for themselves.
+    [Parameter] public bool HideLabel { get; set; }
+
+    [Parameter, EditorRequired] public IReadOnlyList<SegmentedOption<TValue>> Options { get; set; } = [];
+
+    [Parameter] public TValue? Value { get; set; }
+
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    private bool IsSelected(TValue value) => EqualityComparer<TValue>.Default.Equals(value, Value);
+
+    private async Task Select(TValue value)
+    {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+
+    private const string SegmentClasses =
+        "flex min-h-11 cursor-pointer items-center justify-center rounded-lg px-3 py-1 text-center text-sm font-semibold transition-colors " +
+        "text-stone-600 hover:text-stone-950 has-checked:bg-white has-checked:text-stone-950 has-checked:shadow-sm " +
+        "dark:text-stone-300 dark:hover:text-white dark:has-checked:bg-stone-600 dark:has-checked:text-white " +
+        "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-emerald-600 dark:has-focus-visible:outline-emerald-400";
+}

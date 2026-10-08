@@ -1,0 +1,40 @@
+@* A button at least 44 px tall (a comfortable touch target). Extra attributes (aria-*, autofocus, ...) go to the <button>. *@
+
+<button type="@Type" class="@Classes" disabled="@Disabled" @onclick="OnClick" @attributes="AdditionalAttributes">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Secondary;
+
+    [Parameter] public string Type { get; set; } = "button";
+
+    [Parameter] public bool Disabled { get; set; }
+
+    // A 44 px square for one icon, instead of padding around a text.
+    [Parameter] public bool IconOnly { get; set; }
+
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    // Layout classes from the caller, e.g. "w-full".
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    // Whole class names only: Tailwind generates the classes it finds in this file.
+    private string Classes => $"{Base} {(IconOnly ? "size-11" : "px-4")} {VariantClasses} {Class}";
+
+    private const string Base =
+        "inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl font-semibold transition-colors " +
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:focus-visible:outline-emerald-400 " +
+        "disabled:cursor-not-allowed disabled:opacity-40";
+
+    private string VariantClasses => Variant switch
+    {
+        ButtonVariant.Primary => "bg-emerald-700 text-white hover:bg-emerald-800 active:bg-emerald-900 disabled:hover:bg-emerald-700 dark:bg-emerald-400 dark:text-stone-950 dark:hover:bg-emerald-300 dark:active:bg-emerald-200 dark:disabled:hover:bg-emerald-400",
+        ButtonVariant.Ghost => "hover:bg-stone-900/5 active:bg-stone-900/10 disabled:hover:bg-transparent dark:hover:bg-white/10 dark:active:bg-white/15",
+        _ => "bg-stone-200 text-stone-900 hover:bg-stone-300 active:bg-stone-400 disabled:hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 dark:active:bg-stone-600 dark:disabled:hover:bg-stone-800",
+    };
+}

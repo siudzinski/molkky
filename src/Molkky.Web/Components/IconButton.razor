@@ -1,0 +1,21 @@
+@* A square, icon-only button. Label is required: it is the button's name for screen readers (aria-label) and its tooltip. *@
+
+<Button Variant="Variant" IconOnly="true" Class="@Class" Disabled="Disabled" OnClick="OnClick" aria-label="@Label" title="@Label" @attributes="AdditionalAttributes">
+    <Icon Name="Icon" />
+</Button>
+
+@code {
+    [Parameter, EditorRequired] public IconName Icon { get; set; }
+
+    [Parameter, EditorRequired] public string Label { get; set; } = default!;
+
+    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Ghost;
+
+    [Parameter] public bool Disabled { get; set; }
+
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+}
