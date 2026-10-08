@@ -7,7 +7,7 @@ using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
 
-public class NewGameTests : MudBlazorTestContext
+public class NewGameTests : AppTestContext
 {
     private static IElement Button(IRenderedComponent<NewGame> page, string text) =>
         page.FindAll("button").Single(button => button.TextContent.Trim() == text);
@@ -16,7 +16,7 @@ public class NewGameTests : MudBlazorTestContext
     {
         foreach (var name in names)
         {
-            page.Find("input").Change(name);
+            page.Find("input").Input(name);
             Button(page, "Add").Click();
         }
     }
@@ -100,5 +100,41 @@ public class NewGameTests : MudBlazorTestContext
         page.WaitForAssertion(() => Assert.EndsWith("/gameplay", Uri));
         Assert.Equal(MaximumPointsStrategies.BackToZero, StartedGame().Settings.MaximumPoints);
         Assert.Equal(MissedThrowsStrategies.BackToZero, StartedGame().Settings.MissedThrows);
+    }
+
+    [Fact]
+    public void A_player_can_be_removed_with_their_remove_button()
+    {
+        var page = Render<NewGame>();
+        AddPlayers(page, "Ala", "Bob", "Cyd");
+
+        page.Find("button[aria-label='Remove Bob']").Click();
+
+        Assert.Equal(["Ala", "Cyd"], page.FindAll("li").Select(item => item.QuerySelector("span.truncate")!.TextContent.Trim()));
+        Button(page, "Start game").Click();
+        page.WaitForAssertion(() => Assert.Equal(new[] { "Ala", "Cyd" }, Names(StartedGame()).Order()));
+    }
+
+    [Fact]
+    public void Names_are_entered_without_surrounding_spaces_and_blank_ones_are_ignored()
+    {
+        var page = Render<NewGame>();
+
+        AddPlayers(page, "  Ala ", "   ", "Bob");
+
+        Assert.Equal(2, page.FindAll("li").Count);
+        Button(page, "Start game").Click();
+        page.WaitForAssertion(() => Assert.Equal(new[] { "Ala", "Bob" }, Names(StartedGame()).Order()));
+    }
+
+    [Fact]
+    public void Says_how_many_players_a_game_needs_until_it_has_them()
+    {
+        var page = Render<NewGame>();
+        Assert.Contains("Add at least 2 players to start.", page.Markup);
+
+        AddPlayers(page, "Ala", "Bob");
+
+        Assert.DoesNotContain("Add at least 2 players to start.", page.Markup);
     }
 }

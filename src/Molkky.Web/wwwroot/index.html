@@ -3,22 +3,39 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>molkky</title>
+    <!-- No maximum-scale or user-scalable=no: people must be able to zoom. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Mölkky</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <!-- The browser bar in the colours of the app bar. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e3e9d8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f271d" />
+    <link href="css/app.css" rel="stylesheet" />
     <script type="importmap"></script>
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <div id="app">
+        <!-- Until the app starts: the same splash as App.razor, without words (the language is not known yet). -->
+        <div class="grid min-h-dvh place-items-center">
+            <p class="text-3xl font-bold tracking-tight">Mölkky</p>
+        </div>
+    </div>
 
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        // Offline support. The URL is relative to <base href>, so on GitHub Pages it is /molkky/service-worker.js
+        // with the scope /molkky/. updateViaCache none: each check for a new version goes past the HTTP cache.
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" });
+        }
+    </script>
 </body>
 
 </html>

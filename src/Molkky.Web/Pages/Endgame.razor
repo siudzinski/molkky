@@ -6,67 +6,71 @@
 
 <PageTitle>@Text.EndgameLabel</PageTitle>
 
-<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-    <MudGrid>
-        <MudItem xs="2">
-            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
-        </MudItem>
-        <MudItem xs="8">
-            <MudText Align="Align.Center" Typo="Typo.h5">@Winner @(Text.WinnerHeaderText)!</MudText>
-        </MudItem>
-        <MudItem xs="2">
-            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
-        </MudItem>
-        <MudItem xs="12">
-            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="@Options" Width="100%" CanHideSeries/>
-        </MudItem>
-        <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">@Text.PlayAgainLabel</MudButton>
-        </MudItem>
-        <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">@Text.NewGameLabel</MudButton>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+@if (game is not null && stats is not null)
+{
+    <div class="space-y-4">
+        <div class="flex flex-col items-center gap-3 pt-2 text-center">
+            <span class="grid size-16 place-items-center rounded-full bg-primary text-on-primary shadow-edge shadow-primary-edge">
+                <Icon Name="IconName.Trophy" Class="size-9" />
+            </span>
+            <h1 class="text-3xl font-bold tracking-tight">@stats.Winner @(Text.WinnerHeaderText)!</h1>
+        </div>
+
+        <Card>
+            <h2 class="mb-3 text-sm font-semibold text-muted">@Text.ScoreChartTitle</h2>
+            <LineChart Title="@Text.ScoreChartTitle" Series="@series" Max="Game.PointsToWin" YStep="10"
+                       XLabel="@Text.RoundLabel" SeriesLabel="@Text.PlayerLabel" />
+        </Card>
+
+        <div class="space-y-3">
+            <Button Variant="ButtonVariant.Primary" Class="min-h-14 w-full text-lg" OnClick="PlayAgain">@Text.PlayAgainLabel</Button>
+            <Button Class="min-h-12 w-full" OnClick="NewGame">@Text.NewGameLabel</Button>
+        </div>
+
+        @* A mis-tapped winning throw goes straight here: Undo takes it back and returns to the game. *@
+        <div class="flex items-center justify-center gap-1 text-sm text-ink/80">
+            <p><span class="sr-only">@Text.LastThrowLabel: </span>@winningThrow.Player · @(winningThrow.Points == 0 ? Text.MissButton : winningThrow.Points.ToString())</p>
+            <Button Variant="ButtonVariant.Ghost" OnClick="Undo">
+                <Icon Name="IconName.Undo" Class="size-5" />
+                @Text.UndoButton
+            </Button>
+        </div>
+    </div>
+}
 
 @code {
     [Inject]
     private GameStore GameStore { get; set; } = default!;
 
     private Game? game;
-    
-    public string Winner = string.Empty;
-    public List<ChartSeries> Series = new List<ChartSeries>();
-    public string[] XAxisLabels = Array.Empty<string>();
-    public ChartOptions Options = new ChartOptions() { YAxisTicks = 1 };
+    private Stats? stats;
+    private IReadOnlyList<LineSeries> series = [];
+    // Who made the winning throw and its points: what Undo takes back.
+    private (string Player, int Points) winningThrow;
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-
-        game = await GameStore.Load();
-        if (game is not { AnyWinner: true })
+        var saved = await GameStore.Load();
+        if (saved is not { AnyWinner: true })
         {
             // Nothing finished to show (e.g. this address opened in a new tab): start a new game.
             NavigationManager.NavigateTo("");
             return;
         }
 
-        var stats = game.ToStats();
+        game = saved;
+        stats = saved.ToStats();
 
-        var players = new List<ChartSeries>();
-        foreach (var player in stats.Players)
-        {
-            players.Add(new ChartSeries 
-            { 
-                Name = player.Name, 
-                Data = player.ScoreHistory
-            });
-        }
+        // Each player's score after every throw, from 0 (ToStats lists the players as AllPlayers does); the
+        // legend from the winner down.
+        series = stats.Players
+            .Zip(saved.AllPlayers, (player, seat) => (player, color: PlayerColors.For(seat.ColorIndex)))
+            .Select(line => new LineSeries(line.player.Name, line.player.ScoreHistory, line.color.Line, line.color.Swatch))
+            .OrderByDescending(line => line.Values[^1])
+            .ToList();
 
-        Series = players;
-        XAxisLabels = stats.Rounds;
-        Winner = stats.Winner;
+        // The player before the last throw is the one who made it.
+        winningThrow = (saved.Undo().CurrentPlayer.Name, saved.Throws[^1]);
     }
 
     private void NewGame()
@@ -79,6 +83,16 @@
         if (game is not null)
         {
             await GameStore.Save(game.PlayAgain());
+            NavigationManager.NavigateTo("gameplay");
+        }
+    }
+
+    // Drops the winning throw, saved before the game page reads it.
+    private async Task Undo()
+    {
+        if (game is not null)
+        {
+            await GameStore.Save(game.Undo());
             NavigationManager.NavigateTo("gameplay");
         }
     }

@@ -1,0 +1,49 @@
+@using Molkky.Domain
+@inherits TranslatableComponentBase
+
+@* The players in this round's throwing order with the current player marked, then the players who are out.
+   One table each: a row per player, headed by the name, with misses in a row and score. *@
+
+<div class="space-y-3 rounded-2xl bg-panel p-2 ring-1 ring-line backdrop-blur-md">
+    @Table(Text.ThrowingOrderLabel, Game.Players, eliminated: false)
+
+    @if (Game.Losers.Count > 0)
+    {
+        @Table(Text.EliminatedLabel, Game.Losers, eliminated: true)
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Game Game { get; set; } = default!;
+
+    private const string Cell = "py-2";
+    private const string CurrentCell = "py-2 bg-highlight text-on-highlight";
+
+    private RenderFragment Table(string caption, IReadOnlyList<Player> players, bool eliminated) =>
+        @<table class="w-full border-separate border-spacing-y-1">
+            <caption class="px-2 pt-1 text-left text-sm font-semibold text-muted">@caption</caption>
+            <thead class="sr-only">
+                <tr>
+                    <td></td>
+                    <th scope="col">@Text.PlayerLabel</th>
+                    <th scope="col">@Text.MissesInARowLabel</th>
+                    <th scope="col">@Text.ScoreLabel</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in players)
+                {
+                    var current = ReferenceEquals(player, Game.CurrentPlayer);
+                    var cell = current ? CurrentCell : Cell;
+                    <tr aria-current="@(current ? "true" : null)" class="@(eliminated ? "text-muted" : null)">
+                        <td class="@cell w-12 rounded-l-xl pl-2">
+                            <span class="@(eliminated ? "flex opacity-50" : "flex")"><Avatar Letter="@player.FirstLetter" ColorClasses="@PlayerColors.For(player.ColorIndex).Avatar" /></span>
+                        </td>
+                        <th scope="row" class="@cell max-w-0 truncate pl-1 text-left font-medium @(eliminated ? "line-through" : null)">@player.Name</th>
+                        <td class="@cell w-16 text-right"><MissMarks Count="player.NumberOfFailedThrows" /></td>
+                        <td class="@cell w-14 rounded-r-xl pr-3 text-right text-lg font-bold tabular-nums">@player.Score</td>
+                    </tr>
+                }
+            </tbody>
+        </table>;
+}

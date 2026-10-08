@@ -1,0 +1,126 @@
+@using System.Globalization
+
+@* A line chart in SVG: one line per series from 0 to Max, a legend with each series' last value and, for
+   screen readers, the same numbers as a table. The x axis is the position in Values: 0, 1, 2, ... *@
+
+<figure class="@Class">
+    <svg viewBox="0 0 @Width @Height" class="w-full overflow-visible" role="img" aria-labelledby="@_titleId">
+        <title id="@_titleId">@Title</title>
+
+        @foreach (var tick in YTicks)
+        {
+            var y = N(Y(tick));
+            @* A group around each tick: in a code block Razor would read a bare <text> as its own tag. *@
+            <g>
+                <line x1="@Left" x2="@(Width - Right)" y1="@y" y2="@y" class="stroke-line" stroke-width="1" />
+                <text x="@(Left - 6)" y="@y" class="fill-muted" font-size="11" text-anchor="end" dominant-baseline="middle">@N(tick)</text>
+            </g>
+        }
+
+        @foreach (var x in XTicks)
+        {
+            <g><text x="@N(X(x))" y="@(Height - 6)" class="fill-muted" font-size="11" text-anchor="middle">@x</text></g>
+        }
+
+        @foreach (var series in Series.Where(series => series.Values.Count > 0))
+        {
+            var last = series.Values.Count - 1;
+            <polyline points="@Points(series)" class="@series.LineClass" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+            <circle cx="@N(X(last))" cy="@N(Y(series.Values[last]))" r="4" class="@series.LineClass fill-surface" stroke-width="2.5" />
+        }
+    </svg>
+
+    <figcaption>
+        <ul class="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm" aria-hidden="true">
+            @foreach (var series in Series)
+            {
+                <li class="flex min-w-0 items-center gap-2">
+                    <span class="size-3 shrink-0 rounded-full @series.SwatchClass"></span>
+                    <span class="truncate">@series.Name</span>
+                    @if (series.Values.Count > 0)
+                    {
+                        <span class="ml-auto font-semibold tabular-nums">@N(series.Values[^1])</span>
+                    }
+                </li>
+            }
+        </ul>
+    </figcaption>
+
+    <table class="sr-only">
+        <caption>@Title</caption>
+        <thead>
+            <tr>
+                <th scope="col">@SeriesLabel</th>
+                @for (var x = 0; x < Count; x++)
+                {
+                    <th scope="col">@XLabel @x</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var series in Series)
+            {
+                <tr>
+                    <th scope="row">@series.Name</th>
+                    @for (var x = 0; x < Count; x++)
+                    {
+                        <td>@(x < series.Values.Count ? N(series.Values[x]) : "")</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</figure>
+
+@code {
+    private readonly string _titleId = ElementIds.Next("chart-title");
+
+    [Parameter, EditorRequired] public string Title { get; set; } = default!;
+
+    [Parameter, EditorRequired] public IReadOnlyList<LineSeries> Series { get; set; } = [];
+
+    // The top of the y axis; values are drawn from 0 to Max.
+    [Parameter] public double Max { get; set; } = 100;
+
+    [Parameter] public double YStep { get; set; } = 10;
+
+    // Names of an x position and of a series in the table, e.g. "Round" and "Player".
+    [Parameter, EditorRequired] public string XLabel { get; set; } = default!;
+
+    [Parameter, EditorRequired] public string SeriesLabel { get; set; } = default!;
+
+    [Parameter] public string? Class { get; set; }
+
+    // The viewBox, and the margins around the plot for the axis labels. The SVG scales to the width it gets.
+    public const int Width = 320;
+    public const int Height = 200;
+    public const int Left = 30;
+    public const int Right = 12;
+    public const int Top = 10;
+    public const int Bottom = 24;
+
+    // Positions on the x axis: the longest series, and at least two so a single point has room.
+    private int Count => Math.Max(2, Series.Select(series => series.Values.Count).DefaultIfEmpty(0).Max());
+
+    private IEnumerable<double> YTicks => Enumerable.Range(0, (int)(Max / YStep) + 1).Select(i => i * YStep);
+
+    // About eight labels at most, so they never run into each other.
+    private IEnumerable<int> XTicks
+    {
+        get
+        {
+            var step = Math.Max(1, (int)Math.Ceiling((Count - 1) / 8.0));
+            return Enumerable.Range(0, Count).Where(x => x % step == 0);
+        }
+    }
+
+    private double X(int x) => Left + x * (Width - Left - Right) / (double)(Count - 1);
+
+    private double Y(double value) => Top + (Height - Top - Bottom) * (1 - Math.Clamp(value, 0, Max) / Max);
+
+    private string Points(LineSeries series) =>
+        string.Join(" ", series.Values.Select((value, x) => $"{N(X(x))},{N(Y(value))}"));
+
+    // SVG and the table need "12.5" whatever the culture: Polish would write "12,5".
+    private static string N(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

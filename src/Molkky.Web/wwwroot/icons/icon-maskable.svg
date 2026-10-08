@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- The maskable icon: the same, with the lawn to the edges for the launcher to crop. -->
+  <defs>
+    <linearGradient id="lawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b3cf93" />
+      <stop offset="1" stop-color="#8fb56b" />
+    </linearGradient>
+    <!-- A pin seen from above, on its darker edge; the 12 in orange. -->
+    <g id="pin"><circle cy="6" r="40" fill="#c4a773" /><circle r="40" fill="#f6ead2" stroke="#c4a773" stroke-width="3" /></g>
+    <g id="twelve"><circle cy="6" r="40" fill="#b06f12" /><circle r="40" fill="#eb9d2a" stroke="#b06f12" stroke-width="3" /></g>
+  </defs>
+  <rect width="512" height="512" fill="url(#lawn)" />
+  <!-- 7 9 8 / 5 11 12 6 / 3 10 4 / 1 2, inside the maskable safe zone (a circle of 40% radius). -->
+  <use href="#pin" x="166" y="139" /><use href="#pin" x="256" y="139" /><use href="#pin" x="346" y="139" />
+  <use href="#pin" x="121" y="217" /><use href="#pin" x="211" y="217" /><use href="#twelve" x="301" y="217" /><use href="#pin" x="391" y="217" />
+  <use href="#pin" x="166" y="295" /><use href="#pin" x="256" y="295" /><use href="#pin" x="346" y="295" />
+  <use href="#pin" x="211" y="373" /><use href="#pin" x="301" y="373" />
+</svg>

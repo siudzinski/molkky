@@ -1,0 +1,40 @@
+@inherits TranslatableComponentBase
+
+@* Throw entry: the pins as they stand on the field, plus Miss. A tap reports the throw at once; Undo takes it back. *@
+
+<div class="space-y-3">
+    <div class="mx-auto grid max-w-80 grid-cols-8 gap-2">
+        @foreach (var pin in Formation)
+        {
+            var points = pin.Points;
+            <button type="button" class="@PinClasses @pin.Position" @onclick="() => OnThrow.InvokeAsync(points)">@points</button>
+        }
+    </div>
+
+    <button type="button" class="@MissClasses" @onclick="() => OnThrow.InvokeAsync(0)">@Text.MissButton</button>
+</div>
+
+@code {
+    // Points of the throw: 1-12 for a pin, 0 for a miss.
+    [Parameter] public EventCallback<int> OnThrow { get; set; }
+
+    // 7 9 8 / 5 11 12 6 / 3 10 4 / 1 2: each pin spans two of eight columns, every other row shifted by one.
+    private static readonly (int Points, string Position)[] Formation =
+    [
+        (7, "col-start-2 row-start-1"), (9, "col-start-4 row-start-1"), (8, "col-start-6 row-start-1"),
+        (5, "col-start-1 row-start-2"), (11, "col-start-3 row-start-2"), (12, "col-start-5 row-start-2"), (6, "col-start-7 row-start-2"),
+        (3, "col-start-2 row-start-3"), (10, "col-start-4 row-start-3"), (4, "col-start-6 row-start-3"),
+        (1, "col-start-3 row-start-4"), (2, "col-start-5 row-start-4"),
+    ];
+
+    // Birch, like the pins, standing on the lawn on a darker edge; pressed down when tapped.
+    private const string PinClasses =
+        "col-span-2 aspect-square rounded-full text-2xl font-bold tabular-nums select-none touch-manipulation transition " +
+        "bg-birch text-on-birch ring-1 ring-birch-edge/60 shadow-edge shadow-birch-edge hover:bg-birch-hover active:translate-y-0.5 active:shadow-edge-pressed " +
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
+
+    private const string MissClasses =
+        "flex h-14 w-full items-center justify-center rounded-2xl text-lg font-semibold select-none touch-manipulation transition " +
+        "border border-secondary-edge bg-secondary text-ink shadow-edge shadow-secondary-edge hover:bg-secondary-hover active:translate-y-0.5 active:shadow-edge-pressed " +
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
+}

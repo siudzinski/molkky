@@ -1,0 +1,146 @@
+/* Source of wwwroot/css/app.css, which the build generates with the Tailwind CLI (npm run build:css). */
+
+@import "tailwindcss" source(none);
+
+/* Tailwind only generates the classes it finds here: write class names whole, never concatenated. */
+@source "../**/*.razor";
+@source "../**/*.cs";
+@source "../wwwroot/index.html";
+
+/* Inter (SIL Open Font License, wwwroot/fonts), self-hosted so the app works offline. Paths are relative to
+   wwwroot/css/app.css. */
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/inter-latin-wght-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Latin Extended: the Polish letters (ą, ć, ę, ł, ń, ś, ź, ż). */
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/inter-latin-ext-wght-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+    /* A raised edge under buttons and pins; pair with a colour, e.g. `shadow-edge shadow-primary-edge`. */
+    --shadow-edge: 0 3px 0 0 rgb(0 0 0 / 0.25);
+    --shadow-edge-pressed: 0 1px 0 0 rgb(0 0 0 / 0.25);
+}
+
+/*
+  The palette: what each colour is for, as utilities (bg-lawn, text-muted, ...). The values are below, once
+  for light and once for dark, so components need no dark: variants for these and a new palette is one edit.
+*/
+@theme inline {
+    --color-lawn: var(--lawn);
+    --color-lawn-far: var(--lawn-far);
+    --color-panel: var(--panel);
+    --color-surface: var(--surface);
+    --color-line: var(--line);
+    --color-ink: var(--ink);
+    --color-muted: var(--muted);
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-primary-edge: var(--primary-edge);
+    --color-on-primary: var(--on-primary);
+    --color-secondary: var(--secondary);
+    --color-secondary-hover: var(--secondary-hover);
+    --color-secondary-edge: var(--secondary-edge);
+    --color-track: var(--track);
+    --color-selected: var(--selected);
+    --color-highlight: var(--highlight);
+    --color-on-highlight: var(--on-highlight);
+    --color-birch: var(--birch);
+    --color-birch-hover: var(--birch-hover);
+    --color-birch-edge: var(--birch-edge);
+    --color-on-birch: var(--on-birch);
+    --color-danger: var(--danger);
+    --color-focus: var(--focus);
+}
+
+/* Light: a sunny lawn, frosted sage panels, white cards, orange actions, a highlighter for the current player. */
+:root {
+    --lawn: #b3cf93;
+    --lawn-far: #96bb73;
+    --panel: rgb(236 240 228 / 0.86);
+    --surface: #ffffff;
+    --line: #d5dbc8;
+    --ink: #1d2118;
+    --muted: #535a49;
+    --primary: #eb9d2a;
+    --primary-hover: #f2aa3e;
+    --primary-edge: #b06f12;
+    --on-primary: #1d2118;
+    --secondary: #ffffff;
+    --secondary-hover: #fff8ec;
+    --secondary-edge: #d8932c;
+    --track: rgb(29 33 24 / 0.09);
+    --selected: #ffffff;
+    --highlight: #f9dd8a;
+    --on-highlight: #1d2118;
+    --birch: #f6ead2;
+    --birch-hover: #fbf3e3;
+    --birch-edge: #c4a773;
+    --on-birch: #3b2c14;
+    --danger: #c0341d;
+    --focus: #1e40af;
+}
+
+/* Dark: the same lawn at dusk. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --lawn: #1f2d1c;
+        --lawn-far: #152013;
+        --panel: rgb(31 39 29 / 0.88);
+        --surface: #252e22;
+        --line: #3a4735;
+        --ink: #eef2e8;
+        --muted: #a9b39e;
+        --primary: #eda238;
+        --primary-hover: #f4b155;
+        --primary-edge: #8f5a0e;
+        --on-primary: #1d2118;
+        --secondary: #2c3628;
+        --secondary-hover: #34402f;
+        --secondary-edge: #b9802a;
+        --track: rgb(0 0 0 / 0.28);
+        --selected: #46543f;
+        --highlight: #5a4a1f;
+        --on-highlight: #fbf0d4;
+        --birch: #ddcca8;
+        --birch-hover: #e8dabb;
+        --birch-edge: #8b7550;
+        --on-birch: #2a1f0d;
+        --danger: #ff8a70;
+        --focus: #8ab4ff;
+    }
+}
+
+@layer base {
+    /* Light or dark as the system is set; native controls and scrollbars follow. */
+    html {
+        color-scheme: light dark;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* The lawn, a little deeper towards the bottom of the screen. */
+    body {
+        @apply bg-lawn text-ink antialiased;
+        background-image: linear-gradient(to bottom, var(--lawn), var(--lawn-far));
+        background-attachment: fixed;
+    }
+
+    /* FocusOnNavigate (App.razor) moves focus to each page's h1 for screen readers: no ring for that. */
+    h1:focus {
+        outline: none;
+    }
+}

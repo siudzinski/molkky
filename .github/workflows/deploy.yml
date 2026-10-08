@@ -26,6 +26,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # The publish generates the Tailwind CSS with the CLI from node_modules
+      - name: Install npm packages
+        run: npm ci
+
       # GHPages=true rewrites <base href> to /molkky/ and adds 404.html for deep links
       - name: Publish
         run: dotnet publish src/Molkky.Web/Molkky.Web.csproj -c Release -o publish -p:GHPages=true

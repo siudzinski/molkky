@@ -1,0 +1,12 @@
+{
+  "name": "molkky",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss --input src/Molkky.Web/Styles/app.css --output src/Molkky.Web/wwwroot/css/app.css --minify",
+    "watch:css": "tailwindcss --input src/Molkky.Web/Styles/app.css --output src/Molkky.Web/wwwroot/css/app.css --watch=always"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

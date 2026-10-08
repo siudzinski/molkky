@@ -4,21 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Molkky.Domain;
 using Molkky.Domain.Storage;
 using Molkky.Web.Infrastructure;
-using MudBlazor.Services;
 
 namespace Molkky.Web.Tests;
 
 // Base class for component tests: registers what the app registers in Program.cs, with
 // localStorage in memory.
-public abstract class MudBlazorTestContext : BunitContext
+public abstract class AppTestContext : BunitContext
 {
     protected FakeLocalStorage Storage { get; } = new();
 
-    protected MudBlazorTestContext()
+    protected AppTestContext()
     {
-        // MudBlazor components call into JavaScript; let every call succeed with a default result.
-        JSInterop.Mode = JSRuntimeMode.Loose;
-        Services.AddMudServices();
         Services.AddSingleton<ILocalStorage>(Storage);
         Services.AddSingleton<GameStore>();
         Services.AddSingleton<SettingsStore>();

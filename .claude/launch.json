@@ -8,6 +8,18 @@
       "port": 5295
     },
     {
+      "name": "molkky-watch",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["watch", "--project", "src/Molkky.Web/Molkky.Web.csproj", "--launch-profile", "http", "--non-interactive"],
+      "env": { "DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER": "1" },
+      "port": 5295
+    },
+    {
+      "name": "molkky-css-watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "watch:css"]
+    },
+    {
       "name": "molkky-ghpages",
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--file", "tools/serve-ghpages/serve.cs"],

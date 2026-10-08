@@ -1,0 +1,16 @@
+@* A player's misses in a row as crosses, with the count for screen readers. Nothing when there are none. *@
+
+@if (Count > 0)
+{
+    <span class="inline-flex items-center gap-0.5 text-danger">
+        @for (var i = 0; i < Count; i++)
+        {
+            <Icon Name="IconName.Close" Class="size-4" />
+        }
+        <span class="sr-only">@Count</span>
+    </span>
+}
+
+@code {
+    [Parameter, EditorRequired] public int Count { get; set; }
+}

@@ -1,0 +1,14 @@
+@* A round badge with a player's initial. Decorative: the player's name is always shown next to it. *@
+
+<span class="inline-flex shrink-0 items-center justify-center rounded-full font-bold @SizeClasses @ColorClasses" aria-hidden="true">@Letter</span>
+
+@code {
+    [Parameter, EditorRequired] public string Letter { get; set; } = default!;
+
+    // Background and text colour, e.g. PlayerColors.For(player.ColorIndex).Avatar.
+    [Parameter, EditorRequired] public string ColorClasses { get; set; } = default!;
+
+    [Parameter] public bool Large { get; set; }
+
+    private string SizeClasses => Large ? "size-14 text-2xl" : "size-9 text-base";
+}

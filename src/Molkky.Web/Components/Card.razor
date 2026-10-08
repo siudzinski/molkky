@@ -1,0 +1,13 @@
+@* A raised surface that groups related content. *@
+
+<div class="rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line @Class" @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+}

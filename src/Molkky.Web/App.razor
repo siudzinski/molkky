@@ -9,16 +9,18 @@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <NotFound />
             </LayoutView>
         </NotFound>
     </Router>
 }
 else
 {
-    <p>Loading...</p>
+    @* The same splash as index.html, without words: the language is not known yet. *@
+    <div class="grid min-h-dvh place-items-center">
+        <p class="text-3xl font-bold tracking-tight">Mölkky</p>
+    </div>
 }
 
 @code {
