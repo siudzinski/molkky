@@ -8,7 +8,7 @@ using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
 
-public class GameplayTests : MudBlazorTestContext
+public class GameplayTests : AppTestContext
 {
     private static Game Play(Game game, params int[] throws) => throws.Aggregate(game, (current, points) => current.Throw(points));
 

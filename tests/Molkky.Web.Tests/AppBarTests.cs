@@ -6,7 +6,7 @@ using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
-public class AppBarTests : MudBlazorTestContext
+public class AppBarTests : AppTestContext
 {
     private Translator Translator => Services.GetRequiredService<Translator>();
 

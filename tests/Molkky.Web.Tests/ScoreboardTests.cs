@@ -4,7 +4,7 @@ using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
-public class ScoreboardTests : MudBlazorTestContext
+public class ScoreboardTests : AppTestContext
 {
     private static Game Play(Game game, params int[] throws) => throws.Aggregate(game, (current, points) => current.Throw(points));
 

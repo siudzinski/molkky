@@ -4,7 +4,7 @@ namespace Molkky.Web.Tests;
 
 public class PlayerColorsTests
 {
-    // The five colours, in the order players had them with MudBlazor: primary (violet), secondary (pink),
+    // The five colours, in the order players had them before: primary (violet), secondary (pink),
     // info (blue), success (green), warning (orange).
     [Theory]
     [InlineData(0, "bg-violet-600")]

@@ -7,7 +7,7 @@ using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
 
-public class SettingsTests : MudBlazorTestContext
+public class SettingsTests : AppTestContext
 {
     // The radio buttons under the segments, in page order: max score in half, back to zero, disqualified, back to zero.
     private static IElement Radio(IRenderedComponent<Settings> page, int index) => page.FindAll("input[type=radio]")[index];

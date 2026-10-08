@@ -6,7 +6,7 @@ using Molkky.Web.Components;
 namespace Molkky.Web.Tests;
 
 // The generic components in Components/: what they do beyond markup.
-public class ComponentTests : MudBlazorTestContext
+public class ComponentTests : AppTestContext
 {
     [Fact]
     public void An_icon_button_is_named_by_its_label()

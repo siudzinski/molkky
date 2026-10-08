@@ -5,7 +5,7 @@ using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
-public class ScorePadTests : MudBlazorTestContext
+public class ScorePadTests : AppTestContext
 {
     private readonly List<int> _thrown = [];
 

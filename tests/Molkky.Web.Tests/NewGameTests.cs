@@ -7,7 +7,7 @@ using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
 
-public class NewGameTests : MudBlazorTestContext
+public class NewGameTests : AppTestContext
 {
     private static IElement Button(IRenderedComponent<NewGame> page, string text) =>
         page.FindAll("button").Single(button => button.TextContent.Trim() == text);

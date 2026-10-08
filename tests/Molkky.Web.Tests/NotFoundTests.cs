@@ -5,7 +5,7 @@ using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
-public class NotFoundTests : MudBlazorTestContext
+public class NotFoundTests : AppTestContext
 {
     [Fact]
     public async Task The_not_found_page_is_translated()

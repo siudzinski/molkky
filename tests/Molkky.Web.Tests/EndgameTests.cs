@@ -6,7 +6,7 @@ using Molkky.Web.Pages;
 
 namespace Molkky.Web.Tests;
 
-public class EndgameTests : MudBlazorTestContext
+public class EndgameTests : AppTestContext
 {
     // Ala scores 1 a throw, Bob 12 and Cyd misses: from round 2 on the order is Cyd, Ala, Bob. Cyd is
     // out after round 3; Bob reaches exactly 50 with the last throw of round 5.

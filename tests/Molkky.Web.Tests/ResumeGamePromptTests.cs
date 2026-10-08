@@ -6,7 +6,7 @@ using Molkky.Web.Shared;
 
 namespace Molkky.Web.Tests;
 
-public class ResumeGamePromptTests : MudBlazorTestContext
+public class ResumeGamePromptTests : AppTestContext
 {
     // Round 1 done: Cyd (1) throws first in round 2, then Bob (3), then Ala (5).
     private static Game UnfinishedGame() =>

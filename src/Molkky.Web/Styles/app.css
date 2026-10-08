@@ -1,8 +1,5 @@
 /* Source of wwwroot/css/app.css, which the build generates with the Tailwind CLI (npm run build:css). */
 
-/* MudBlazor's CSS has its own layer, above Tailwind's base and below its utilities (css/mudblazor-layer.css). */
-@layer theme, base, mudblazor, components, utilities;
-
 @import "tailwindcss" source(none);
 
 /* Tailwind only generates the classes it finds here: write class names whole, never concatenated. */

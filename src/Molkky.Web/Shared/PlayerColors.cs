@@ -5,7 +5,7 @@ namespace Molkky.Web.Shared;
 public sealed record PlayerColor(string Avatar, string Line, string Swatch);
 
 // Maps a player's palette index (Player.ColorIndex) to their colour. The hues keep the order players had
-// with MudBlazor (primary, secondary, info, success, warning). Shades keep the white initial readable;
+// in the app before (primary, secondary, info, success, warning). Shades keep the white initial readable;
 // chart lines get lighter on the dark background.
 public static class PlayerColors
 {
