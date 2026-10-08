@@ -4,7 +4,7 @@
 @inherits TranslatableComponentBase
 @inject NavigationManager NavigationManager
 
-<PageTitle>@Translator.Get("EndgameLabel")</PageTitle>
+<PageTitle>@Text.EndgameLabel</PageTitle>
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
@@ -12,7 +12,7 @@
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
         </MudItem>
         <MudItem xs="8">
-            <MudText Align="Align.Center" Typo="Typo.h5">@Winner @Translator.Get("WinnerHeaderText")!</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h5">@Winner @(Text.WinnerHeaderText)!</MudText>
         </MudItem>
         <MudItem xs="2">
             <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Style="color: gold;" />
@@ -21,17 +21,17 @@
             <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="@Options" Width="100%" CanHideSeries/>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">@Translator.Get("PlayAgainLabel")</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="PlayAgain">@Text.PlayAgainLabel</MudButton>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">@Translator.Get("NewGameLabel")</MudButton>
+            <MudButton Variant="Variant.Filled" FullWidth="true" OnClick="NewGame">@Text.NewGameLabel</MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>
 
 @code {
     [Inject]
-    private GameSessionStorage? GameStorage { get; set; }
+    private GameStore GameStore { get; set; } = default!;
 
     private Game? game;
     
@@ -44,13 +44,16 @@
     {
         await base.OnInitializedAsync();
 
-        if(GameStorage is null) return;
-        
-        game = await GameStorage.LoadGameState();
-        var stats = game?.ToStats();
+        game = await GameStore.Load();
+        if (game is not { AnyWinner: true })
+        {
+            // Nothing finished to show (e.g. this address opened in a new tab): start a new game.
+            NavigationManager.NavigateTo("");
+            return;
+        }
 
-        if (stats is null) return;
-        
+        var stats = game.ToStats();
+
         var players = new List<ChartSeries>();
         foreach (var player in stats.Players)
         {
@@ -73,10 +76,9 @@
 
     private async Task PlayAgain()
     {
-        if(game is not null && GameStorage is not null)
+        if (game is not null)
         {
-            game.PlayAgain();
-            await GameStorage.SaveGameState(game);
+            await GameStore.Save(game.PlayAgain());
             NavigationManager.NavigateTo("gameplay");
         }
     }

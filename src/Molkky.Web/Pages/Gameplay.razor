@@ -14,7 +14,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.Alarm" />
                 </MudItem>
                 <MudItem>
-                    <MudText>@Translator.Get("RoundLabel"): @game?.RoundNumber</MudText>
+                    <MudText>@Text.RoundLabel: @game?.RoundNumber</MudText>
                 </MudItem>
             </MudGrid>
         </MudItem>
@@ -24,13 +24,13 @@
                 {
                     <MudGrid>
                         <MudItem xs="4">
-                            <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), game.CurrentPlayer.AvatarColor, true))">@game.CurrentPlayer.FirstLetter</MudAvatar>
+                            <MudAvatar Size="Size.Large" Color="@PlayerColors.For(game.CurrentPlayer.ColorIndex)">@game.CurrentPlayer.FirstLetter</MudAvatar>
                         </MudItem>
                         <MudItem xs="8">
                             <MudGrid>
                                 <MudItem xs="8">
                                     <MudText Typo="Typo.h5">@game.CurrentPlayer.Name</MudText>
-                                    <MudText>@Translator.Get("ScoreLabel"): @game.CurrentPlayer.Score</MudText>
+                                    <MudText>@Text.ScoreLabel: @game.CurrentPlayer.Score</MudText>
                                 </MudItem>
                                 <MudItem xs="4">
                                     @if (game.CurrentPlayer.InDanger)
@@ -58,13 +58,13 @@
                         <MudCardContent>
                             <MudGrid>
                                 <MudItem xs="4">
-                                    <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), player.AvatarColor, true))">@player.FirstLetter</MudAvatar>
+                                    <MudAvatar Size="Size.Large" Color="@PlayerColors.For(player.ColorIndex)">@player.FirstLetter</MudAvatar>
                                 </MudItem>
                                 <MudItem xs="8">
                                     <MudGrid>
                                         <MudItem xs="8">
                                             <MudText Typo="Typo.h6">@player.Name</MudText>
-                                            <MudText>@Translator.Get("ScoreLabel"): @player.Score</MudText>
+                                            <MudText>@Text.ScoreLabel: @player.Score</MudText>
                                         </MudItem>
                                         <MudItem xs="4" >
                                             @if (player.InDanger)
@@ -89,7 +89,7 @@
                 {
                     <MudItem xs="12" sm="6" md="4">
                     <MudChip Disabled="true" Class="full-width-chip" Size="Size.Large" Color="Color.Default">
-                        <MudAvatar Size="Size.Large" Color="@((Color)Enum.Parse(typeof(Color), loser.AvatarColor, true))">@loser.FirstLetter</MudAvatar>
+                        <MudAvatar Size="Size.Large" Color="@PlayerColors.For(loser.ColorIndex)">@loser.FirstLetter</MudAvatar>
                         @loser.Name
                     </MudChip>
                 </MudItem>
@@ -103,34 +103,32 @@
     private Game? game;
 
     [Inject]
-    private GameSessionStorage? GameStorage { get; set; }
+    private GameStore GameStore { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        if(GameStorage is not null)
+        game = await GameStore.Load();
+        if (game is null)
         {
-            game = await GameStorage.LoadGameState();
+            NavigationManager.NavigateTo("");
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(GameStorage is not null)
-        {
-            await GameStorage.SaveGameState(game);
-        }
-
-        if(game?.AnyWinner ?? false)
+        else if (game.AnyWinner)
         {
             NavigationManager.NavigateTo("endgame");
         }
     }
 
-    private void AddScore(int score)
+    // Saves every throw straight away. The winning one is saved before the endgame page reads it.
+    private async Task AddScore(int score)
     {
-        if(game is not null)
+        if (game is null) return;
+
+        game = game.Throw(score);
+        await GameStore.Save(game);
+
+        if (game.AnyWinner)
         {
-            game.SetThrowScoreForCurrentPlayer(score);
+            NavigationManager.NavigateTo("endgame");
         }
     }
 }

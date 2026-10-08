@@ -1,0 +1,32 @@
+@using Molkky.Web.Infrastructure
+@inject GameStore GameStore
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+@* Once per app start (it sits in MainLayout): offers to carry on with a saved, unfinished game. *@
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // After the first render, so the dialog provider next to it in MainLayout is ready.
+        if (!firstRender) return;
+
+        var game = await GameStore.Load();
+        if (game is null || game.AnyWinner) return;
+
+        var parameters = new DialogParameters<ResumeGameDialog> { { dialog => dialog.Game, game } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, NoHeader = true, DisableBackdropClick = true, CloseOnEscapeKey = false };
+        var dialog = await DialogService.ShowAsync<ResumeGameDialog>("", parameters, options);
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+        {
+            await GameStore.Clear();
+            NavigationManager.NavigateTo("");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("gameplay");
+        }
+    }
+}

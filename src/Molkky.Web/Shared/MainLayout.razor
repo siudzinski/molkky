@@ -5,6 +5,7 @@
 <MudThemeProvider @bind-IsDarkMode="@_darkTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<ResumeGamePrompt />
 
 <MudLayout>
     <MudAppBar>
@@ -22,8 +23,8 @@
             <MudText Typo="Typo.h6">Mölkky</MudText>
         </MudDrawerHeader>
         <MudNavMenu>
-            <MudNavLink Href="" Match="NavLinkMatch.All">@Translator.Get("NewGameNavLink")</MudNavLink>
-            <MudNavLink Href="settings" Match="NavLinkMatch.All">@Translator.Get("SettingsNavLink")</MudNavLink>
+            <MudNavLink Href="" Match="NavLinkMatch.All">@Translator.Text.NewGameNavLink</MudNavLink>
+            <MudNavLink Href="settings" Match="NavLinkMatch.All">@Translator.Text.SettingsNavLink</MudNavLink>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
@@ -46,9 +47,9 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    void LanguageToggle()
+    async Task LanguageToggle()
     {
         _isDefaultLanguage = !_isDefaultLanguage;
-        Translator.SetLanguage(_isDefaultLanguage ? Translations.English : Translations.Polish);
+        await Translator.SetLanguage(_isDefaultLanguage ? Translations.English : Translations.Polish);
     }
 }

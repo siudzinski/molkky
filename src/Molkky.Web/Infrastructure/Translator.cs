@@ -1,42 +1,54 @@
-using Microsoft.JSInterop;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Molkky.Web.Infrastructure;
 
-public class Translator
+public class Translator(ILocalStorage storage)
 {
-    private const string StorageKey = "language";
-
-    private readonly IJSRuntime _jsRuntime;
+    public const string StorageKey = "molkky.language";
+    private const int Version = 1;
 
     public string Language { get; private set; } = Translations.English;
 
-    public Translator(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    // Every visible string in the current language.
+    public Texts Text => Translations.For(Language);
 
     public event Action? OnLanguageChanged;
 
+    // English when no language is saved, or the saved one is unreadable or not one the app has.
     public async Task LoadLanguage()
     {
-        var language = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", StorageKey);
-        Language = language ?? Translations.English;
+        Language = Read(await storage.GetItem(StorageKey)) ?? Translations.English;
     }
 
-    public void SetLanguage(string language)
+    public async Task SetLanguage(string language)
     {
         Language = language;
-        SaveLanguage();
         OnLanguageChanged?.Invoke();
+        await storage.SetItem(StorageKey, JsonSerializer.Serialize(new LanguageDocumentV1(Version, language), LanguageJsonContext.Default.LanguageDocumentV1));
     }
 
-    public string Get(string key)
+    private static string? Read(string? json)
     {
-        return Translations.Items[Language][key];
-    }
+        try
+        {
+            var document = string.IsNullOrWhiteSpace(json) ? null : JsonSerializer.Deserialize(json, LanguageJsonContext.Default.LanguageDocumentV1);
 
-    private void SaveLanguage()
-    {
-        _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", StorageKey, Language);
+            return document is { Version: Version } && Translations.Languages.ContainsKey(document.Language) ? document.Language : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }
+
+// The stored language, version 1: { "version": 1, "language": "pl" }.
+internal sealed record LanguageDocumentV1(int Version, string Language);
+
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    RespectNullableAnnotations = true,
+    RespectRequiredConstructorParameters = true)]
+[JsonSerializable(typeof(LanguageDocumentV1))]
+internal sealed partial class LanguageJsonContext : JsonSerializerContext;
